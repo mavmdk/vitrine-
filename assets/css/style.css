@@ -246,6 +246,11 @@ body{
 /* ---------- responsive ---------- */
 @media (max-width:820px){
   .chapter{align-items:flex-end;padding-bottom:96px}
+  /* en portrait le sujet occupe le centre : le voile passe en vertical */
+  .chapter--hero::before{
+    background:linear-gradient(180deg,rgba(4,6,9,.45) 0%,rgba(4,6,9,.1) 26%,rgba(4,6,9,.78) 62%,rgba(4,6,9,.92) 100%);
+  }
+  .panel--hero h1{text-shadow:0 6px 30px rgba(0,0,0,.7)}
   .chapter[data-side="left"],.chapter[data-side="right"]{justify-content:center}
   .panel{width:min(560px,94vw);padding:26px 24px 28px}
   .panel p{font-size:14px}

@@ -266,13 +266,22 @@ function update(p, dt) {
   camera.position.copy(camState.look).addScaledVector(
     dolly.subVectors(camState.pos, camState.look), narrow
   );
-  camera.lookAt(camState.look);
 
   const fov = camState.fov * clamp(1 + (REF_ASPECT / camera.aspect - 1) * 0.28, 1, 1.35);
   if (Math.abs(camera.fov - fov) > 0.01) {
     camera.fov = fov;
     camera.updateProjectionMatrix();
   }
+
+  // En portrait, les panneaux de texte occupent le bas de l'écran : on incline
+  // la caméra vers le bas pour faire remonter le sujet dans la moitié haute.
+  const drop = (narrow - 1) / 0.75;
+  if (drop > 0.01) {
+    const dist = camera.position.distanceTo(camState.look);
+    const viewH = 2 * dist * Math.tan(THREE.MathUtils.degToRad(fov) / 2);
+    camState.look.y -= viewH * 0.18 * drop;
+  }
+  camera.lookAt(camState.look);
 
   /* --- atmosphère --- */
   const atm = atmosphereAt(p);
