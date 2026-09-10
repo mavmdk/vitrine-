@@ -8,8 +8,8 @@ import * as TEX from './textures.js';
 export const WORLD = {
   radius: 600,        // rayon de la base de la montagne
   peak: 500,          // hauteur brute avant modulation du bruit
-  cloudTop: 122,      // la mer de nuages : le sommet en émerge
-  cloudBottom: 68,
+  cloudTop: 106,      // la mer de nuages : le sommet en émerge
+  cloudBottom: 58,
   gym: new THREE.Vector3(0, 0, 196),
   sunElevation: 34,   // lumière de côté, un peu haute : elle sculpte sans tout noyer
   sunAzimuth: 105
@@ -231,11 +231,13 @@ export function createCloudSea(smokeTex) {
     s.color.setRGB(tint, tint * 0.99, tint * 1.02);
     s.opacity = 0.28 + rand() * 0.42;
     const sp = new THREE.Sprite(s);
-    const scale = 130 + rand() * 340;
-    sp.scale.set(scale, scale * (0.42 + rand() * 0.3), 1);
+    // galettes larges et plates : une mer de nuages, pas des colonnes qui
+    // montent jusqu'à la caméra
+    const scale = 120 + rand() * 310;
+    sp.scale.set(scale, scale * (0.16 + rand() * 0.14), 1);
     sp.position.set(
       Math.cos(a) * rad,
-      lerp(WORLD.cloudBottom, WORLD.cloudTop, rand()) + (rand() - 0.5) * 22,
+      lerp(WORLD.cloudBottom, WORLD.cloudTop, rand()) + (rand() - 0.5) * 10,
       Math.sin(a) * rad
     );
     sp.userData.drift = (rand() - 0.5) * 0.9;

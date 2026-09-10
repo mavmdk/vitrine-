@@ -155,7 +155,7 @@ export function createClimber(name = 'PAULINE') {
 
   const helmet = new THREE.Mesh(
     new THREE.SphereGeometry(0.145, 24, 18, 0, Math.PI * 2, 0, Math.PI * 0.56),
-    mat(HELMET, 0.34, 0.05)
+    mat(HELMET, 0.62, 0.0)   // casque mat : un spéculaire trop dur efface le lettrage
   );
   helmet.position.y = 0.03;
   helmet.scale.set(1.02, 1.08, 1.06);
@@ -176,7 +176,7 @@ export function createClimber(name = 'PAULINE') {
   const label = new THREE.Mesh(labelGeo, new THREE.MeshStandardMaterial({
     map: TEX.helmetLabel(name),
     transparent: true,
-    roughness: 0.36,
+    roughness: 0.68,
     metalness: 0.0,
     depthWrite: false,
     polygonOffset: true,

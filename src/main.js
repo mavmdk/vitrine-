@@ -217,6 +217,8 @@ const stowQuat = new THREE.Quaternion();
 const stowEuler = new THREE.Euler();
 const packUp = new THREE.Vector3();
 const helmetWorld = new THREE.Vector3();
+const dolly = new THREE.Vector3();
+const REF_ASPECT = 1.6;   // ratio de référence des réglages de cadrage
 const quat = new THREE.Quaternion();
 const clock = new THREE.Clock();
 let time = 0;
@@ -253,13 +255,22 @@ function update(p, dt) {
 
   poseClimber(climber, p, time);
 
-  /* --- caméra --- */
+  /* --- caméra ---
+     Le champ de three.js est VERTICAL : en portrait, le champ horizontal
+     s'effondre et le sujet déborde du cadre. On compense en reculant la
+     caméra et en élargissant un peu, proportionnellement au ratio. */
   climber.userData.helmet.getWorldPosition(helmetWorld);
   cameraAt(p, time, { climber: climber.position, helmet: helmetWorld, dumbbell: dumbPos, path }, camState);
-  camera.position.copy(camState.pos);
+
+  const narrow = clamp(REF_ASPECT / camera.aspect, 1, 1.75);
+  camera.position.copy(camState.look).addScaledVector(
+    dolly.subVectors(camState.pos, camState.look), narrow
+  );
   camera.lookAt(camState.look);
-  if (Math.abs(camera.fov - camState.fov) > 0.01) {
-    camera.fov = camState.fov;
+
+  const fov = camState.fov * clamp(1 + (REF_ASPECT / camera.aspect - 1) * 0.28, 1, 1.35);
+  if (Math.abs(camera.fov - fov) > 0.01) {
+    camera.fov = fov;
     camera.updateProjectionMatrix();
   }
 

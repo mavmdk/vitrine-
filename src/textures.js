@@ -98,39 +98,6 @@ export function rockSet(size = 512) {
   };
 }
 
-/* ---------------------------------------------------------- neige */
-export function snowSet(size = 512) {
-  const height = makeCanvas(size);
-  const color = makeCanvas(size);
-  const hi = ctx2d(height).createImageData(size, size);
-  const ci = ctx2d(color).createImageData(size, size);
-
-  for (let y = 0; y < size; y++) {
-    for (let x = 0; x < size; x++) {
-      const u = (x / size) * 6, v = (y / size) * 6;
-      // congères : ondulations douces + cristaux fins
-      const dune = fbm(u * 1.1, v * 2.6, 4);
-      const cryst = valueNoise(x * 1.7, y * 1.7);
-      const h = clamp(dune * 0.82 + cryst * 0.18, 0, 1);
-      const i = (y * size + x) * 4;
-      hi.data[i] = hi.data[i + 1] = hi.data[i + 2] = h * 255;
-      hi.data[i + 3] = 255;
-
-      const l = 0.90 + h * 0.10;
-      ci.data[i] = 246 * l;
-      ci.data[i + 1] = 249 * l;
-      ci.data[i + 2] = 255 * l;      // neige légèrement bleutée
-      ci.data[i + 3] = 255;
-    }
-  }
-  ctx2d(height).putImageData(hi, 0, 0);
-  ctx2d(color).putImageData(ci, 0, 0);
-  return {
-    map: toTexture(color, 1, true),
-    normalMap: toTexture(heightToNormal(height, 1.35))
-  };
-}
-
 /* ------------------------------------------- béton recyclé (têtes d'haltère) */
 export function concreteSet(size = 512) {
   const c = makeCanvas(size);

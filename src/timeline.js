@@ -224,7 +224,7 @@ export function cameraAt(p, time, ctx, out) {
 /* ------------------------------------------------------------- atmosphère */
 const _fogColor = new THREE.Color();
 const SKY_FOG = new THREE.Color(0xa9c6e4);
-const GREY_FOG = new THREE.Color(0x9ea3a9);
+const GREY_FOG = new THREE.Color(0xb0b5bb);
 const GYM_FOG = new THREE.Color(0x0b0d11);
 const CHALK_FOG = new THREE.Color(0xd2d7dd);
 
@@ -236,15 +236,17 @@ export function atmosphereAt(p) {
 
   if (p < P.cut) {
     _fogColor.copy(SKY_FOG).lerp(GREY_FOG, toGrey);
-    density = lerp(0.0011, 0.09, toGrey * toGrey);
-    exposure = lerp(0.72, 0.86, toGrey);
+    // très dense : dans le nuage, on ne doit plus voir que du gris, y compris
+    // la roche à trois mètres — un brouillard "réaliste" ne suffit pas ici
+    density = lerp(0.0011, 0.30, toGrey * toGrey);
+    exposure = lerp(0.72, 0.95, toGrey);
     bloom = lerp(0.30, 0.55, toGrey);
   } else {
     const out = smoothstep(P.cut, P.cut + 0.05, p);
     _fogColor.copy(GREY_FOG).lerp(GYM_FOG, out);
     _fogColor.lerp(CHALK_FOG, chalk * 0.45);
-    density = lerp(0.09, 0.013, out) + chalk * 0.010;
-    exposure = lerp(0.86, 1.0, out);
+    density = lerp(0.30, 0.013, out) + chalk * 0.010;
+    exposure = lerp(0.95, 1.0, out);
     bloom = lerp(0.55, 0.30, out);
   }
 

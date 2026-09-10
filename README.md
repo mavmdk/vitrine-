@@ -73,3 +73,13 @@ vendor/three/         three.js r169 + addons
 L'haltère reprend le design béton/chrome de la référence fournie, mais porte
 le marquage **UPWARD** — pas de logo de marque tierce sur un support
 commercial.
+
+## À personnaliser avant mise en ligne
+
+- `index.html` : l'adresse du bouton « Réserver mon appel »
+  (`mailto:contact@upward.coach`) et le lien « Voir les formules ».
+- `src/main.js` : `createClimber('PAULINE')` — le prénom écrit sur le casque.
+- `src/world.js` : `WORLD.sunElevation` / `sunAzimuth` pour changer l'heure
+  de la journée sur la montagne.
+- Les textes des six chapitres sont dans `index.html`, chacun avec sa plage
+  de scroll (`data-from` / `data-to`, en fraction de la page).
