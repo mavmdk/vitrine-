@@ -169,9 +169,9 @@ export function createClimber(name = 'PAULINE') {
 
   /* le détail qui compte : "PAULINE ♥" écrit sur le casque */
   const labelGeo = new THREE.SphereGeometry(
-    0.1485, 40, 26,
-    Math.PI / 2 - 0.62, 1.24,       // centré sur +Z (l'arrière du casque, face caméra)
-    0.62, 0.52
+    0.1487, 44, 20,
+    Math.PI / 2 - 0.80, 1.60,       // centré sur +Z : l'arrière du casque, face caméra
+    0.84, 0.36                      // bas de calotte : l'étiquette regarde en arrière, pas vers le ciel
   );
   const label = new THREE.Mesh(labelGeo, new THREE.MeshStandardMaterial({
     map: TEX.helmetLabel(name),
@@ -196,34 +196,34 @@ export function createClimber(name = 'PAULINE') {
 
   /* ---- sac à dos (d'où tombe l'haltère) ---- */
   const pack = new THREE.Group();
-  pack.position.set(0, 0.30, 0.24);
+  pack.position.set(0, 0.18, 0.27);   // porté bas, comme un vrai sac d'alpi
   body.add(pack);
 
-  const packBody = new THREE.Mesh(new RoundedBoxGeometry(0.38, 0.52, 0.24, 4, 0.07), mat(0x2d3138, 0.86));
+  const packBody = new THREE.Mesh(new RoundedBoxGeometry(0.44, 0.64, 0.35, 4, 0.08), mat(0x2d3138, 0.86));
   packBody.castShadow = true; packBody.receiveShadow = true;
   pack.add(packBody);
 
-  const packTrim = new THREE.Mesh(new RoundedBoxGeometry(0.30, 0.10, 0.26, 3, 0.04), mat(0x585f68, 0.8));
-  packTrim.position.y = -0.14;
+  const packTrim = new THREE.Mesh(new RoundedBoxGeometry(0.34, 0.10, 0.37, 3, 0.04), mat(0x585f68, 0.8));
+  packTrim.position.y = -0.20;
   pack.add(packTrim);
 
   // rabat ouvert : c'est par là que ça sort
-  const flap = new THREE.Mesh(new RoundedBoxGeometry(0.36, 0.20, 0.06, 3, 0.03), mat(0x22262c, 0.86));
-  flap.position.set(0, 0.30, 0.06);
-  flap.rotation.x = -0.95;
+  const flap = new THREE.Mesh(new RoundedBoxGeometry(0.40, 0.17, 0.05, 3, 0.03), mat(0x22262c, 0.86));
+  flap.position.set(0, 0.34, 0.06);
+  flap.rotation.x = -0.55;
   flap.name = 'flap';
   pack.add(flap);
 
   [-1, 1].forEach((s) => {
-    const strap = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.5, 0.05), mat(0x1d2025, 0.9));
-    strap.position.set(0.14 * s, -0.05, -0.16);
+    const strap = new THREE.Mesh(new THREE.BoxGeometry(0.07, 0.54, 0.05), mat(0x1d2025, 0.9));
+    strap.position.set(0.15 * s, -0.05, -0.20);
     strap.rotation.x = 0.12;
     pack.add(strap);
   });
 
   // piolet sanglé sur le sac
   const axe = new THREE.Group();
-  axe.position.set(-0.2, -0.02, 0.1);
+  axe.position.set(-0.24, -0.02, 0.15);
   axe.rotation.z = 0.22;
   const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.014, 0.014, 0.56, 8), mat(0x14161a, 0.45, 0.35));
   axe.add(shaft);
@@ -235,7 +235,7 @@ export function createClimber(name = 'PAULINE') {
 
   // point d'ancrage de l'haltère dans le sac
   const anchor = new THREE.Object3D();
-  anchor.position.set(0.0, -0.15, 0.02);  // rangée au fond du sac, invisible au départ
+  anchor.position.set(0.0, -0.05, 0.0);   // au fond du sac : invisible tant qu'elle n'a pas glissé
   pack.add(anchor);
 
   /* ---- corde ---- */
@@ -248,7 +248,7 @@ export function createClimber(name = 'PAULINE') {
   ]);
   const rope = new THREE.Mesh(
     new THREE.TubeGeometry(ropeCurve, 48, 0.013, 6, false),
-    mat(0x1d7a44, 0.82)
+    mat(0x1a5c36, 0.9)
   );
   rope.castShadow = true;
   root.add(rope);
@@ -265,7 +265,7 @@ export function createClimber(name = 'PAULINE') {
 /* Pose animée : il monte, se hisse — c'est ce mouvement qui décroche l'haltère. */
 export function poseClimber(climber, p, time) {
   const u = climber.userData;
-  const reach = smoothstep(0.0, 0.085, p);          // il tend le bras droit
+  const reach = smoothstep(0.025, 0.100, p);        // il tend le bras droit
   const settle = smoothstep(0.085, 0.16, p);
   const breathe = Math.sin(time * 1.4) * 0.012;
 
@@ -273,14 +273,15 @@ export function poseClimber(climber, p, time) {
   u.body.rotation.x = -0.12 - reach * 0.10;
   u.body.rotation.z = lerp(0.03, -0.02, reach);
 
-  // bras droit : va chercher la prise en haut
-  u.armR.rotation.x = lerp(-0.55, -2.35, reach);
-  u.armR.rotation.z = lerp(0.25, 0.55, reach);
+  // bras droit : va chercher la prise en haut. Les rotations en z sont
+  // orientées vers l'extérieur, sinon les bras passent devant le casque.
+  u.armR.rotation.x = lerp(-0.42, -2.25, reach);
+  u.armR.rotation.z = lerp(-0.12, -0.34, reach);
   u.armR.userData.elbow.rotation.x = lerp(-0.9, -0.25, reach);
 
   // bras gauche : reste planté sur le piolet
-  u.armL.rotation.x = lerp(-1.75, -1.45, reach);
-  u.armL.rotation.z = lerp(-0.35, -0.2, reach);
+  u.armL.rotation.x = lerp(-1.40, -1.15, reach);
+  u.armL.rotation.z = lerp(0.14, 0.24, reach);
   u.armL.userData.elbow.rotation.x = -0.55;
 
   // jambes : la droite pousse, la gauche remonte
@@ -289,9 +290,10 @@ export function poseClimber(climber, p, time) {
   u.legR.rotation.x = lerp(-0.35, -0.12, reach);
   u.legR.userData.knee.rotation.x = lerp(0.85, 0.4, reach);
 
-  u.neck.rotation.x = lerp(-0.18, -0.42, reach);
+  u.neck.rotation.x = lerp(-0.10, -0.30, reach);
   u.neck.rotation.y = Math.sin(time * 0.6) * 0.05;
 
   // le rabat s'ouvre au moment de l'effort
-  u.flap.rotation.x = lerp(-0.95, -1.65, smoothstep(0.03, 0.1, p));
+  // le rabat se rabat vers l'arrière du sac, il ne doit pas masquer le casque
+  u.flap.rotation.x = lerp(-0.55, -2.25, smoothstep(0.03, 0.1, p));
 }

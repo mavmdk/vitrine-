@@ -6,13 +6,13 @@ import { ridged, fbm, valueNoise, clamp, smoothstep, lerp, rng } from './noise.j
 import * as TEX from './textures.js';
 
 export const WORLD = {
-  radius: 560,        // rayon de la base de la montagne
-  peak: 700,          // hauteur brute avant modulation du bruit
-  cloudTop: 150,      // la mer de nuages : le sommet en émerge
-  cloudBottom: 95,
+  radius: 600,        // rayon de la base de la montagne
+  peak: 500,          // hauteur brute avant modulation du bruit
+  cloudTop: 122,      // la mer de nuages : le sommet en émerge
+  cloudBottom: 68,
   gym: new THREE.Vector3(0, 0, 196),
-  sunElevation: 26,   // lumière rasante de côté : c'est elle qui sculpte le relief
-  sunAzimuth: 100
+  sunElevation: 34,   // lumière de côté, un peu haute : elle sculpte sans tout noyer
+  sunAzimuth: 105
 };
 
 /* ------------------------------------------------------------------ relief */
@@ -22,10 +22,10 @@ export function terrainHeight(x, z) {
   // profil dominant : le cône donne la pente générale (42-52°, une vraie face)
   const cone = Math.pow(1 - r, 1.75);
   // macro-relief : arêtes et épaulements à l'échelle du massif
-  const macro = 0.66 + 0.40 * ridged(x * 0.0026 + 5.5, z * 0.0026 - 3.1, 5);
+  const macro = 0.70 + 0.32 * ridged(x * 0.0026 + 5.5, z * 0.0026 - 3.1, 5);
   // couloirs et goulets
-  const gully = (ridged(x * 0.0105 - 1.7, z * 0.0105 + 4.2, 5) - 0.35) * 20;
-  const rough = (fbm(x * 0.045 - 2.2, z * 0.045 + 7.4, 4) - 0.5) * 4.0;
+  const gully = (ridged(x * 0.0105 - 1.7, z * 0.0105 + 4.2, 5) - 0.35) * 14;
+  const rough = (fbm(x * 0.045 - 2.2, z * 0.045 + 7.4, 4) - 0.5) * 3.4;
   const talus = smoothstep(1.0, 0.5, r);
   return WORLD.peak * cone * macro + (gully + rough) * talus;
 }
@@ -148,9 +148,10 @@ export function createMountain(rockTex) {
 }
 
 /* Dalle très détaillée sous les pieds de l'alpiniste (plan rapproché). */
-export function createCliff(cx, cz, rockTex, snowTex) {
-  const w = 86, d = 118, seg = 210;
-  const geo = new THREE.PlaneGeometry(w, d, seg, seg);
+export function createCliff(cx, cz, rockTex) {
+  // couvre tout le couloir de chute, pas seulement les pieds de l'alpiniste
+  const w = 100, d = 250, segW = 190, segD = 420;
+  const geo = new THREE.PlaneGeometry(w, d, segW, segD);
   geo.rotateX(-Math.PI / 2);
 
   const pos = geo.attributes.position;
@@ -162,9 +163,9 @@ export function createCliff(cx, cz, rockTex, snowTex) {
   geo.computeVertexNormals();
   paintVertexColours(geo, { snowLine: 130 });
 
-  const map = rockTex.map.clone(); map.needsUpdate = true; map.repeat.set(38, 52);
-  const nrm = rockTex.normalMap.clone(); nrm.needsUpdate = true; nrm.repeat.set(38, 52);
-  const rgh = rockTex.roughnessMap.clone(); rgh.needsUpdate = true; rgh.repeat.set(38, 52);
+  const map = rockTex.map.clone(); map.needsUpdate = true; map.repeat.set(44, 110);
+  const nrm = rockTex.normalMap.clone(); nrm.needsUpdate = true; nrm.repeat.set(44, 110);
+  const rgh = rockTex.roughnessMap.clone(); rgh.needsUpdate = true; rgh.repeat.set(44, 110);
 
   const mat = new THREE.MeshStandardMaterial({
     vertexColors: true,
@@ -341,7 +342,7 @@ export function createGym() {
 
   // salle : murs béton sombres, plafond haut
   const wallMat = new THREE.MeshStandardMaterial({
-    color: 0x23262b, roughness: 0.92, metalness: 0.0, side: THREE.BackSide, envMapIntensity: 0.2
+    color: 0x191c21, roughness: 0.94, metalness: 0.0, side: THREE.BackSide, envMapIntensity: 0.15
   });
   const room = new THREE.Mesh(new THREE.BoxGeometry(64, 24, 64), wallMat);
   room.position.y = 11.9;
@@ -349,12 +350,12 @@ export function createGym() {
   g.add(room);
 
   // rampes lumineuses : hors du champ principal, elles servent de sources visibles
-  const stripMat = new THREE.MeshBasicMaterial({ color: 0x7e93ad });
-  for (let i = -1; i <= 1; i++) {
-    const strip = new THREE.Mesh(new THREE.BoxGeometry(18, 0.18, 0.5), stripMat);
-    strip.position.set(0, 13.2, -19 + i * 8);
+  const stripMat = new THREE.MeshBasicMaterial({ color: 0x8095ae });
+  [-1, 1].forEach((sx) => {
+    const strip = new THREE.Mesh(new THREE.BoxGeometry(0.35, 0.16, 34), stripMat);
+    strip.position.set(sx * 15.5, 11.6, -4);
     g.add(strip);
-  }
+  });
 
   // racks et caisses : silhouettes d'arrière-plan
   const propMat = new THREE.MeshStandardMaterial({ color: 0x2a2d33, roughness: 0.55, metalness: 0.5 });
@@ -399,7 +400,7 @@ export function createGym() {
   warm.position.set(-7, 3.5, 11);
   g.add(warm);
 
-  const fill = new THREE.HemisphereLight(0x5d7392, 0x111316, 0.22);
+  const fill = new THREE.HemisphereLight(0x5d7392, 0x0e1013, 0.14);
   g.add(fill);
 
   g.visible = false;

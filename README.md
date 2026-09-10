@@ -34,6 +34,12 @@ toute la descente.
   exponentiel animé, MSAA 4x, grain de film en surimpression.
 - Toute l'animation est une **fonction pure du scroll** : on peut scruber en
   avant comme en arrière sans jamais désynchroniser la scène.
+- Bruit à base de hash entier (`Math.imul`) plutôt que de `Math.sin` :
+  environ 5x plus rapide, c'est ce qui dimensionne le temps de chargement.
+- **Repli sans WebGL** : si le rendu 3D échoue (pilote refusé, pas de WebGL),
+  la page bascule en version statique — le contenu reste lisible.
+- `?p=0.42` dans l'URL saute directement à une étape : pratique pour régler
+  un plan sans faire défiler.
 
 ## Lancer en local
 

@@ -10,6 +10,11 @@ function makeCanvas(size) {
   return c;
 }
 
+/* getImageData est massivement utilisé ici : on le déclare au navigateur. */
+function ctx2d(canvas) {
+  return canvas.getContext('2d', { willReadFrequently: true });
+}
+
 function toTexture(canvas, repeat = 1, srgb = false) {
   const t = new THREE.CanvasTexture(canvas);
   t.wrapS = t.wrapT = THREE.RepeatWrapping;
@@ -22,9 +27,9 @@ function toTexture(canvas, repeat = 1, srgb = false) {
 /* Dérive une normal map depuis un canvas de hauteur (canal rouge). */
 function heightToNormal(heightCanvas, strength = 2.2) {
   const s = heightCanvas.width;
-  const src = heightCanvas.getContext('2d').getImageData(0, 0, s, s).data;
+  const src = ctx2d(heightCanvas).getImageData(0, 0, s, s).data;
   const out = makeCanvas(s);
-  const ctx = out.getContext('2d');
+  const ctx = ctx2d(out);
   const img = ctx.createImageData(s, s);
   const at = (x, y) => src[((y & (s - 1)) * s + (x & (s - 1))) * 4] / 255;
 
@@ -51,9 +56,9 @@ export function rockSet(size = 512) {
   const height = makeCanvas(size);
   const color = makeCanvas(size);
   const rough = makeCanvas(size);
-  const hi = height.getContext('2d').createImageData(size, size);
-  const ci = color.getContext('2d').createImageData(size, size);
-  const ri = rough.getContext('2d').createImageData(size, size);
+  const hi = ctx2d(height).createImageData(size, size);
+  const ci = ctx2d(color).createImageData(size, size);
+  const ri = ctx2d(rough).createImageData(size, size);
 
   for (let y = 0; y < size; y++) {
     for (let x = 0; x < size; x++) {
@@ -82,9 +87,9 @@ export function rockSet(size = 512) {
       ri.data[i + 3] = 255;
     }
   }
-  height.getContext('2d').putImageData(hi, 0, 0);
-  color.getContext('2d').putImageData(ci, 0, 0);
-  rough.getContext('2d').putImageData(ri, 0, 0);
+  ctx2d(height).putImageData(hi, 0, 0);
+  ctx2d(color).putImageData(ci, 0, 0);
+  ctx2d(rough).putImageData(ri, 0, 0);
 
   return {
     map: toTexture(color, 1, true),
@@ -97,8 +102,8 @@ export function rockSet(size = 512) {
 export function snowSet(size = 512) {
   const height = makeCanvas(size);
   const color = makeCanvas(size);
-  const hi = height.getContext('2d').createImageData(size, size);
-  const ci = color.getContext('2d').createImageData(size, size);
+  const hi = ctx2d(height).createImageData(size, size);
+  const ci = ctx2d(color).createImageData(size, size);
 
   for (let y = 0; y < size; y++) {
     for (let x = 0; x < size; x++) {
@@ -118,8 +123,8 @@ export function snowSet(size = 512) {
       ci.data[i + 3] = 255;
     }
   }
-  height.getContext('2d').putImageData(hi, 0, 0);
-  color.getContext('2d').putImageData(ci, 0, 0);
+  ctx2d(height).putImageData(hi, 0, 0);
+  ctx2d(color).putImageData(ci, 0, 0);
   return {
     map: toTexture(color, 1, true),
     normalMap: toTexture(heightToNormal(height, 1.35))
@@ -129,9 +134,9 @@ export function snowSet(size = 512) {
 /* ------------------------------------------- béton recyclé (têtes d'haltère) */
 export function concreteSet(size = 512) {
   const c = makeCanvas(size);
-  const ctx = c.getContext('2d');
+  const ctx = ctx2d(c);
   const h = makeCanvas(size);
-  const hctx = h.getContext('2d');
+  const hctx = ctx2d(h);
 
   const ci = ctx.createImageData(size, size);
   const hi = hctx.createImageData(size, size);
@@ -141,7 +146,7 @@ export function concreteSet(size = 512) {
       const g = fbm(u * 3, v * 3, 4) * 0.5 + valueNoise(x * 1.3, y * 1.3) * 0.5;
       const i = (y * size + x) * 4;
       const l = 0.80 + g * 0.16;
-      ci.data[i] = 196 * l; ci.data[i + 1] = 194 * l; ci.data[i + 2] = 188 * l; ci.data[i + 3] = 255;
+      ci.data[i] = 178 * l; ci.data[i + 1] = 176 * l; ci.data[i + 2] = 170 * l; ci.data[i + 3] = 255;
       hi.data[i] = hi.data[i + 1] = hi.data[i + 2] = g * 255; hi.data[i + 3] = 255;
     }
   }
@@ -177,7 +182,7 @@ export function concreteSet(size = 512) {
 /* ------------------------------------------------- moletage de la poignée */
 export function knurlNormal(size = 256) {
   const c = makeCanvas(size);
-  const ctx = c.getContext('2d');
+  const ctx = ctx2d(c);
   ctx.fillStyle = '#808080';
   ctx.fillRect(0, 0, size, size);
   const img = ctx.getImageData(0, 0, size, size);
@@ -198,7 +203,7 @@ export function knurlNormal(size = 256) {
 /* ---------------------------------------------------------- sprites */
 export function smokeSprite(size = 256) {
   const c = makeCanvas(size);
-  const ctx = c.getContext('2d');
+  const ctx = ctx2d(c);
   const img = ctx.createImageData(size, size);
   const half = size / 2;
   for (let y = 0; y < size; y++) {
@@ -221,7 +226,7 @@ export function smokeSprite(size = 256) {
 
 export function dotSprite(size = 64) {
   const c = makeCanvas(size);
-  const ctx = c.getContext('2d');
+  const ctx = ctx2d(c);
   const g = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
   g.addColorStop(0, 'rgba(255,255,255,1)');
   g.addColorStop(0.35, 'rgba(255,255,255,.7)');
@@ -248,24 +253,38 @@ function drawTracked(ctx, text, cx, y, spacing) {
 }
 
 /* Étiquette du casque : "PAULINE" + cœur. */
-export function helmetLabel(name = 'PAULINE', w = 512, h = 256) {
+export function helmetLabel(name = 'PAULINE', w = 640, h = 200) {
   const c = document.createElement('canvas');
   c.width = w; c.height = h;
-  const ctx = c.getContext('2d');
+  const ctx = ctx2d(c);
   ctx.clearRect(0, 0, w, h);
 
-  ctx.fillStyle = '#14161a';
-  ctx.font = '700 88px Helvetica, Arial, sans-serif';
+  // écrit au marqueur : lettres serrées, un cœur juste après
+  const fs = Math.round(h * 0.62);
+  ctx.font = `700 ${fs}px Helvetica, Arial, sans-serif`;
   ctx.textBaseline = 'middle';
-  drawTracked(ctx, name, w * 0.5, h * 0.42, 7);
 
-  // cœur tracé à la main, un peu irrégulier (marqueur)
-  const hx = w * 0.5, hy = h * 0.72, s = 30;
+  const chars = [...name];
+  const spacing = fs * 0.06;
+  let textW = 0;
+  for (const ch of chars) textW += ctx.measureText(ch).width + spacing;
+  const heartW = fs * 0.9;
+  const total = textW + heartW;
+
+  let x = (w - total) / 2;
+  const y = h * 0.52;
+  ctx.fillStyle = '#15171b';
+  for (const ch of chars) {
+    ctx.fillText(ch, x, y);
+    x += ctx.measureText(ch).width + spacing;
+  }
+
+  const hx = x + heartW * 0.45, hy = y, sc = fs * 0.30;
   ctx.fillStyle = '#c0392b';
   ctx.beginPath();
-  ctx.moveTo(hx, hy + s * 0.72);
-  ctx.bezierCurveTo(hx - s * 1.32, hy - s * 0.16, hx - s * 0.46, hy - s * 0.96, hx, hy - s * 0.26);
-  ctx.bezierCurveTo(hx + s * 0.46, hy - s * 0.96, hx + s * 1.32, hy - s * 0.16, hx, hy + s * 0.72);
+  ctx.moveTo(hx, hy + sc * 0.78);
+  ctx.bezierCurveTo(hx - sc * 1.34, hy - sc * 0.14, hx - sc * 0.46, hy - sc * 0.98, hx, hy - sc * 0.28);
+  ctx.bezierCurveTo(hx + sc * 0.46, hy - sc * 0.98, hx + sc * 1.34, hy - sc * 0.14, hx, hy + sc * 0.78);
   ctx.fill();
 
   const t = new THREE.CanvasTexture(c);
@@ -280,7 +299,7 @@ export function upwardLogo(w = 1024, h = 256, opts = {}) {
   const bg = opts.bg || null;
   const c = document.createElement('canvas');
   c.width = w; c.height = h;
-  const ctx = c.getContext('2d');
+  const ctx = ctx2d(c);
   if (bg) { ctx.fillStyle = bg; ctx.fillRect(0, 0, w, h); } else ctx.clearRect(0, 0, w, h);
 
   const fs = Math.round(h * 0.52);
@@ -330,7 +349,7 @@ export function upwardLogo(w = 1024, h = 256, opts = {}) {
 /* Petit décal gravé sur les têtes de l'haltère (flèche seule, ou "50"). */
 export function stampTexture(kind = 'arrow', size = 256) {
   const c = makeCanvas(size);
-  const ctx = c.getContext('2d');
+  const ctx = ctx2d(c);
   ctx.clearRect(0, 0, size, size);
   ctx.fillStyle = '#101114';
   if (kind === 'weight') {
@@ -361,8 +380,8 @@ export function stampTexture(kind = 'arrow', size = 256) {
 export function floorSet(size = 512) {
   const color = makeCanvas(size);
   const height = makeCanvas(size);
-  const ctx = color.getContext('2d');
-  const hctx = height.getContext('2d');
+  const ctx = ctx2d(color);
+  const hctx = ctx2d(height);
 
   ctx.fillStyle = '#17181b';
   ctx.fillRect(0, 0, size, size);
@@ -396,7 +415,7 @@ export function floorSet(size = 512) {
 /* Tache de magnésie au sol. */
 export function chalkPatch(size = 256) {
   const c = makeCanvas(size);
-  const ctx = c.getContext('2d');
+  const ctx = ctx2d(c);
   ctx.clearRect(0, 0, size, size);
   const img = ctx.createImageData(size, size);
   const half = size / 2;

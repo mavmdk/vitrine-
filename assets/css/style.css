@@ -209,8 +209,8 @@ body{
 }
 .chapter[data-side="center"] .lede{margin:0 auto}
 
-/* fog chapter reads on grey */
-.panel--fog{background:rgba(12,14,17,.34);border-color:rgba(255,255,255,.22)}
+/* dans le brouillard, le fond est clair : le panneau doit foncer, pas s'éclaircir */
+.panel--fog{background:rgba(6,8,11,.74);border-color:rgba(255,255,255,.16)}
 
 /* final : la marque occupe le haut du cadre, l'appel à l'action le bas */
 .chapter--final{align-items:flex-end;padding-bottom:clamp(28px,7vh,80px)}
@@ -256,3 +256,15 @@ body{
   #grain{animation:none}
   .scrollhint i{animation:none}
 }
+
+/* ---------- repli sans WebGL : la page reste une vraie page ---------- */
+body.no3d{background:linear-gradient(180deg,#0a0d12 0%,#12161c 45%,#080a0d 100%)}
+body.no3d #scene,body.no3d #grain,body.no3d #flash{display:none}
+body.no3d #scroll{height:auto;padding:120px 0 80px}
+body.no3d .chapter{
+  position:relative;inset:auto;opacity:1;visibility:visible;
+  min-height:0;padding:34px clamp(18px,6vw,110px);pointer-events:auto;
+}
+body.no3d .chapter::before{display:none}
+body.no3d .panel{opacity:1 !important;transform:none !important;backdrop-filter:none;background:rgba(255,255,255,.04)}
+body.no3d .panel--hero{background:transparent}

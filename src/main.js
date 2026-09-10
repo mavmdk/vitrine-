@@ -17,7 +17,7 @@ import { Burst, Trail, createChalkCloud, createShockwave } from './fx.js';
 import { buildPath, spinAt, cameraAt, atmosphereAt, P } from './timeline.js';
 import { clamp, smoothstep, lerp } from './noise.js';
 
-const CLIMBER_X = 6, CLIMBER_Z = 150;
+const CLIMBER_X = 6, CLIMBER_Z = 210;   // pente locale ~48° : une face raide mais praticable
 const AGE_ROCK = 26;      // conversion scroll -> secondes pour les impacts roche
 const AGE_CHALK = 15;
 
@@ -104,16 +104,15 @@ async function build() {
 
   // la neige renvoie énormément de lumière : le rebond au sol est presque aussi
   // clair que le ciel, c'est ce qui empêche les ombres de virer au noir
-  const bounce = new THREE.HemisphereLight(0xa9cdf6, 0xb3bcc6, 0.55);
+  const bounce = new THREE.HemisphereLight(0xa9cdf6, 0xb3bcc6, 0.62);
   scene.add(bounce);
 
   await step(24, 'roche & neige');
   const rockTex = TEX.rockSet(lowPower ? 256 : 512);
-  const snowTex = TEX.snowSet(256);
 
   await step(46, 'modelage du relief');
   mountainGroup.add(W.createMountain(rockTex));
-  mountainGroup.add(W.createCliff(CLIMBER_X, CLIMBER_Z + 16, rockTex, snowTex));
+  mountainGroup.add(W.createCliff(CLIMBER_X, CLIMBER_Z + 95, rockTex));
   mountainGroup.add(W.createDistantRange());
 
   await step(62, 'nuages');
@@ -213,6 +212,11 @@ function updateChapters(p) {
 const camState = { pos: new THREE.Vector3(), look: new THREE.Vector3(), fov: 34 };
 const dumbPos = new THREE.Vector3();
 const anchorWorld = new THREE.Vector3();
+const anchorQuat = new THREE.Quaternion();
+const stowQuat = new THREE.Quaternion();
+const stowEuler = new THREE.Euler();
+const packUp = new THREE.Vector3();
+const helmetWorld = new THREE.Vector3();
 const quat = new THREE.Quaternion();
 const clock = new THREE.Clock();
 let time = 0;
@@ -223,20 +227,25 @@ function update(p, dt) {
   /* --- haltère : dans le sac, puis en chute --- */
   if (p <= P.release) {
     climber.updateWorldMatrix(true, true);
-    climber.userData.anchor.getWorldPosition(anchorWorld);
-    // elle remonte doucement dans le sac : on la voit glisser avant de tomber
-    const slip = smoothstep(0.035, P.release, p);
-    dumbPos.copy(anchorWorld);
-    dumbPos.y += slip * 0.20;
-    dumbPos.z += slip * 0.07;
+    const anchor = climber.userData.anchor;
+    anchor.getWorldPosition(anchorWorld);
+    anchor.getWorldQuaternion(anchorQuat);
+    // elle glisse le long de l'axe du sac, pas de l'axe du monde :
+    // le dos est incliné, l'haltère doit l'être aussi
+    packUp.set(0, 1, 0).applyQuaternion(anchorQuat);
+    const slip = smoothstep(0.04, P.release, p);
+    dumbPos.copy(anchorWorld).addScaledVector(packUp, slip * 0.34);
   } else {
     path.sample(p, dumbPos);
   }
   dumbbell.position.copy(dumbPos);
   if (p <= P.release) {
     // rangée verticalement dans le sac : elle ne dépasse pas
-    const slip = smoothstep(0.035, P.release, p);
-    dumbbell.rotation.set(0.18 + slip * 0.5, 0.35, Math.PI / 2 - slip * 0.35);
+    // rangée dans le sac : elle suit l'orientation du sac
+    const slip = smoothstep(0.04, P.release, p);
+    stowEuler.set(0.10 + slip * 0.55, 0.34, Math.PI / 2 - slip * 0.30);
+    stowQuat.setFromEuler(stowEuler);
+    dumbbell.quaternion.copy(anchorQuat).multiply(stowQuat);
   } else {
     spinAt(p, quat);
     dumbbell.quaternion.copy(quat);
@@ -245,7 +254,8 @@ function update(p, dt) {
   poseClimber(climber, p, time);
 
   /* --- caméra --- */
-  cameraAt(p, time, { climber: climber.position, dumbbell: dumbPos, path }, camState);
+  climber.userData.helmet.getWorldPosition(helmetWorld);
+  cameraAt(p, time, { climber: climber.position, helmet: helmetWorld, dumbbell: dumbPos, path }, camState);
   camera.position.copy(camState.pos);
   camera.lookAt(camState.look);
   if (Math.abs(camera.fov - camState.fov) > 0.01) {
@@ -362,6 +372,9 @@ build().then(() => {
   clock.start();
   requestAnimationFrame(tick);
 }).catch((err) => {
+  // pas de WebGL, pilote refusé, mémoire insuffisante : on bascule en page statique
   console.error(err);
-  loaderEl.querySelector('.loader__hint').textContent = 'échec du rendu 3D — ' + err.message;
+  document.body.classList.add('no3d');
+  loaderEl.classList.add('is-done');
+  hintEl.remove();
 });

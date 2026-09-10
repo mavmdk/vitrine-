@@ -129,18 +129,22 @@ function handheld(time, amp, out) {
 }
 
 export function cameraAt(p, time, ctx, out) {
-  const { climber, dumbbell, path } = ctx;
+  const { climber, helmet, dumbbell, path } = ctx;
   const g = WORLD.gym;
 
   /* --- A. deux temps.
      A0 : macro sur le casque — on lit « PAULINE ♥ ».
      A1 : recul au téléobjectif, le sommet écrase le grimpeur. */
-  const pull = smoothstep(0.030, 0.088, p);
+  const pull = smoothstep(0.038, 0.098, p);
 
+  // calé sur la position réelle du casque, et dans l'axe de l'étiquette
+  // (le casque bascule avec la nuque : viser une hauteur fixe ne marche pas)
+  // de plain-pied avec le casque : le sac reste sous l'axe et n'occulte rien
+  // côté soleil : le casque doit être éclairé pour que l'étiquette se lise
   const closeP = _tmpA.set(
-    climber.x + 1.18,
-    climber.y + 1.98,
-    climber.z + 2.42
+    helmet.x + 0.78,
+    helmet.y + 0.42,
+    helmet.z + 2.36
   );
   const wideP = _tmpB.set(
     climber.x + 3.6,
@@ -149,11 +153,11 @@ export function cameraAt(p, time, ctx, out) {
   );
   _pos.copy(closeP).lerp(wideP, pull);
 
-  const closeL = _tmpA.set(climber.x - 0.42, climber.y + 1.60, climber.z + 0.04);
+  const closeL = _tmpA.set(helmet.x - 0.46, helmet.y + 0.12, helmet.z);
   const wideL = _tmpB.set(climber.x - 1.5, climber.y + 3.5, climber.z + 0.2);
   _look.copy(closeL).lerp(wideL, pull);
 
-  let fov = lerp(32, 30, pull);
+  let fov = lerp(29, 30, pull);
   let shake = lerp(0.006, 0.02, pull);
 
   /* --- B. la caméra décroche et suit l'haltère --- */
@@ -220,27 +224,27 @@ export function cameraAt(p, time, ctx, out) {
 /* ------------------------------------------------------------- atmosphère */
 const _fogColor = new THREE.Color();
 const SKY_FOG = new THREE.Color(0xa9c6e4);
-const GREY_FOG = new THREE.Color(0xb2b6bb);
+const GREY_FOG = new THREE.Color(0x9ea3a9);
 const GYM_FOG = new THREE.Color(0x0b0d11);
 const CHALK_FOG = new THREE.Color(0xd2d7dd);
 
 export function atmosphereAt(p) {
   const toGrey = smoothstep(0.36, P.cloudEnter + 0.05, p);
-  const chalk = smoothstep(P.land, P.land + 0.018, p) * (1 - smoothstep(P.land + 0.03, P.land + 0.13, p));
+  const chalk = smoothstep(P.land, P.land + 0.014, p) * (1 - smoothstep(P.land + 0.02, P.land + 0.085, p));
 
   let density, exposure, bloom;
 
   if (p < P.cut) {
     _fogColor.copy(SKY_FOG).lerp(GREY_FOG, toGrey);
-    density = lerp(0.0011, 0.085, toGrey * toGrey);
-    exposure = lerp(0.66, 1.05, toGrey);
+    density = lerp(0.0011, 0.09, toGrey * toGrey);
+    exposure = lerp(0.72, 0.86, toGrey);
     bloom = lerp(0.30, 0.55, toGrey);
   } else {
     const out = smoothstep(P.cut, P.cut + 0.05, p);
     _fogColor.copy(GREY_FOG).lerp(GYM_FOG, out);
-    _fogColor.lerp(CHALK_FOG, chalk * 0.8);
-    density = lerp(0.085, 0.014, out) + chalk * 0.020;
-    exposure = lerp(1.05, 1.0, out);
+    _fogColor.lerp(CHALK_FOG, chalk * 0.45);
+    density = lerp(0.09, 0.013, out) + chalk * 0.010;
+    exposure = lerp(0.86, 1.0, out);
     bloom = lerp(0.55, 0.30, out);
   }
 
