@@ -227,8 +227,8 @@ export function createCloudSea(smokeTex) {
     const a = rand() * Math.PI * 2;
     const rad = 90 + Math.pow(rand(), 0.6) * 1500;
     const s = mat.clone();
-    const tint = 0.86 + rand() * 0.14;
-    s.color.setRGB(tint, tint * 0.99, tint * 1.02);
+    const tint = 0.68 + rand() * 0.20;
+    s.color.setRGB(tint, tint * 0.99, tint * 1.03);
     s.opacity = 0.28 + rand() * 0.42;
     const sp = new THREE.Sprite(s);
     // galettes larges et plates : une mer de nuages, pas des colonnes qui
@@ -257,9 +257,11 @@ export function createFallClouds(smokeTex, path) {
     const s = new THREE.SpriteMaterial({
       map: smokeTex, transparent: true, depthWrite: false, fog: false
     });
-    const tint = 0.72 + rand() * 0.26;
-    s.color.setRGB(tint, tint, tint * 1.02);
-    s.opacity = 0.34 + rand() * 0.5;
+    // gris et non blanc : une dizaine de sprites superposés saturent sinon
+    // l'image et la traversée vire au blanc pur
+    const tint = 0.50 + rand() * 0.22;
+    s.color.setRGB(tint, tint, tint * 1.03);
+    s.opacity = 0.30 + rand() * 0.42;
     const sp = new THREE.Sprite(s);
     const sc = 9 + rand() * 34;
     sp.scale.set(sc, sc * (0.6 + rand() * 0.5), 1);
