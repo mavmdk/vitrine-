@@ -146,6 +146,43 @@ export function concreteSet(size = 512) {
   };
 }
 
+/* ------------------------------------------------------------ textile
+   Armure toile + duvet matelassé : sans ça, une veste en 3D reste un aplat
+   de couleur, et c'est ce qui trahit le rendu en gros plan. */
+export function fabricSet(size = 256) {
+  const height = makeCanvas(size);
+  const rough = makeCanvas(size);
+  const hi = ctx2d(height).createImageData(size, size);
+  const ri = ctx2d(rough).createImageData(size, size);
+
+  for (let y = 0; y < size; y++) {
+    for (let x = 0; x < size; x++) {
+      // armure : deux trames croisées à haute fréquence
+      const weave = (Math.sin(x * 1.35) * 0.5 + 0.5) * (Math.sin(y * 1.35) * 0.5 + 0.5);
+      const fuzz = valueNoise(x * 2.1, y * 2.1) * 0.35;
+      // matelassage : ondulation large, comme les caissons d'une doudoune
+      const quilt = fbm(x / size * 3.2, y / size * 3.2, 3);
+      const h = clamp(weave * 0.42 + fuzz + quilt * 0.36, 0, 1);
+
+      const i = (y * size + x) * 4;
+      hi.data[i] = hi.data[i + 1] = hi.data[i + 2] = h * 255;
+      hi.data[i + 3] = 255;
+
+      // les creux du tissu accrochent moins la lumière que les crêtes
+      const r = clamp(0.62 + (1 - h) * 0.26 + fuzz * 0.2, 0, 1);
+      ri.data[i] = ri.data[i + 1] = ri.data[i + 2] = r * 255;
+      ri.data[i + 3] = 255;
+    }
+  }
+  ctx2d(height).putImageData(hi, 0, 0);
+  ctx2d(rough).putImageData(ri, 0, 0);
+
+  return {
+    normalMap: toTexture(heightToNormal(height, 1.5)),
+    roughnessMap: toTexture(rough)
+  };
+}
+
 /* ------------------------------------------------- moletage de la poignée */
 export function knurlNormal(size = 256) {
   const c = makeCanvas(size);

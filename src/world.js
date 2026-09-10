@@ -385,6 +385,37 @@ export function createGym() {
     g.add(d);
   }
 
+  /* --- faisceaux de lumière : invisibles dans l'air pur, ils apparaissent
+     quand la magnésie met la salle en suspension. C'est physiquement juste
+     et c'est ce qui donne le volume à l'image. --- */
+  const shaftCanvas = document.createElement('canvas');
+  shaftCanvas.width = 4; shaftCanvas.height = 64;
+  const sctx = shaftCanvas.getContext('2d');
+  const sgrad = sctx.createLinearGradient(0, 0, 0, 64);
+  sgrad.addColorStop(0, 'rgba(220,235,255,.40)');
+  sgrad.addColorStop(0.55, 'rgba(200,220,245,.12)');
+  sgrad.addColorStop(1, 'rgba(180,200,230,0)');
+  sctx.fillStyle = sgrad;
+  sctx.fillRect(0, 0, 4, 64);
+  const shaftTex = new THREE.CanvasTexture(shaftCanvas);
+  shaftTex.colorSpace = THREE.SRGBColorSpace;
+
+  const shafts = new THREE.Group();
+  shafts.name = 'shafts';
+  [[-3.4, -5], [2.6, 1.5], [6.2, -8]].forEach(([sx, sz], i) => {
+    const cone = new THREE.Mesh(
+      new THREE.CylinderGeometry(0.7, 6.2 + i * 1.1, 12.4, 26, 1, true),
+      new THREE.MeshBasicMaterial({
+        map: shaftTex, transparent: true, opacity: 0, depthWrite: false,
+        blending: THREE.AdditiveBlending, side: THREE.DoubleSide, fog: false
+      })
+    );
+    cone.position.set(sx, 6.2, sz);
+    cone.rotation.z = (i - 1) * 0.05;
+    shafts.add(cone);
+  });
+  g.add(shafts);
+
   /* --- éclairage : intensités en unités physiques (I / d²) --- */
   const key = new THREE.SpotLight(0xffffff, 1000, 44, 0.78, 0.62, 1.75);
   key.position.set(5.0, 11.0, 6.0);

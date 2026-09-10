@@ -116,6 +116,7 @@ export function spinAt(p, out) {
 /* ---------------------------------------------------------------- caméra */
 const _pos = new THREE.Vector3();
 const _look = new THREE.Vector3();
+const _subject = new THREE.Vector3();   // point de mise au point
 const _tmpA = new THREE.Vector3();
 const _tmpB = new THREE.Vector3();
 
@@ -159,6 +160,11 @@ export function cameraAt(p, time, ctx, out) {
 
   let fov = lerp(29, 30, pull);
   let shake = lerp(0.006, 0.02, pull);
+  // ouverture : très courte sur le plan macro (l'arrière-plan fond),
+  // presque fermée sur le plan large (paysage net)
+  _subject.copy(helmet);
+  let aperture = lerp(0.00115, 0.00007, pull);
+  let maxblur = lerp(0.0135, 0.0042, pull);
 
   /* --- B. la caméra décroche et suit l'haltère --- */
   const follow = smoothstep(P.release, P.release + 0.06, p);
@@ -178,6 +184,9 @@ export function cameraAt(p, time, ctx, out) {
     _look.lerp(_tmpB, follow);
     fov = lerp(fov, 48, follow);
     shake = lerp(shake, 0.07, follow);
+    _subject.lerp(dumbbell, follow);
+    aperture = lerp(aperture, 0.00042, follow);
+    maxblur = lerp(maxblur, 0.0095, follow);
   }
 
   /* --- C. dans les nuages : plan très serré --- */
@@ -187,6 +196,9 @@ export function cameraAt(p, time, ctx, out) {
     _pos.lerp(_tmpB, inCloud);
     _look.lerp(dumbbell, inCloud);
     fov = lerp(fov, 54, inCloud);
+    _subject.lerp(dumbbell, inCloud);
+    aperture = lerp(aperture, 0.00075, inCloud);
+    maxblur = lerp(maxblur, 0.012, inCloud);
   }
 
   /* --- D. box crossfit : caméra basse, on suit l'objet qui tombe --- */
@@ -212,12 +224,21 @@ export function cameraAt(p, time, ctx, out) {
 
     fov = lerp(46, 36, fin);
     shake = lerp(0.045, 0.006, Math.max(drop * 0.5, fin));
+
+    _subject.copy(dumbbell);
+    _tmpB.set(g.x, g.y + 5.3, g.z);              // la marque, en fin de séquence
+    _subject.lerp(_tmpB, fin);
+    aperture = lerp(0.00052, 0.00030, fin);
+    maxblur = lerp(0.0105, 0.0075, fin);
   }
 
   handheld(time, shake, _tmpA);
   out.pos.copy(_pos).add(_tmpA);
   out.look.copy(_look).add(_tmpA.multiplyScalar(0.3));
+  out.subject.copy(_subject);
   out.fov = fov;
+  out.aperture = aperture;
+  out.maxblur = maxblur;
   return out;
 }
 
@@ -240,7 +261,7 @@ export function atmosphereAt(p) {
     // la roche à trois mètres — un brouillard "réaliste" ne suffit pas ici
     density = lerp(0.0011, 0.30, toGrey * toGrey);
     exposure = lerp(0.72, 0.90, toGrey);
-    bloom = lerp(0.30, 0.55, toGrey);
+    bloom = lerp(0.26, 0.5, toGrey);
   } else {
     const out = smoothstep(P.cut, P.cut + 0.05, p);
     _fogColor.copy(GREY_FOG).lerp(GYM_FOG, out);

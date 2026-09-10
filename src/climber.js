@@ -10,10 +10,22 @@ const JACKET = 0xd0491c;      // orange himalaya
 const JACKET_DARK = 0x7a2a0f;
 const PANTS = 0x101216;
 const GEAR = 0x1a1c20;
-const HELMET = 0xe9ecef;
+const HELMET = 0xd6dae0;
 
 function mat(color, rough = 0.68, metal = 0.0) {
   return new THREE.MeshStandardMaterial({ color, roughness: rough, metalness: metal, envMapIntensity: 1.0 });
+}
+
+/* Matériau textile : même base, plus le relief d'armure et le matelassage. */
+const FABRIC = TEX.fabricSet(256);
+function cloth(color, rough = 0.78, repeat = 5) {
+  const n = FABRIC.normalMap.clone(); n.needsUpdate = true; n.repeat.set(repeat, repeat);
+  const r = FABRIC.roughnessMap.clone(); r.needsUpdate = true; r.repeat.set(repeat, repeat);
+  return new THREE.MeshStandardMaterial({
+    color, roughness: rough, metalness: 0,
+    normalMap: n, normalScale: new THREE.Vector2(0.85, 0.85),
+    roughnessMap: r, envMapIntensity: 0.9
+  });
 }
 
 function limb(radius, length, material) {
@@ -27,9 +39,9 @@ export function createClimber(name = 'PAULINE') {
   const root = new THREE.Group();
   root.name = 'climber';
 
-  const jacketMat = mat(JACKET, 0.74);
-  const jacketDarkMat = mat(JACKET_DARK, 0.8);
-  const pantsMat = mat(PANTS, 0.62);
+  const jacketMat = cloth(JACKET, 0.78, 6);
+  const jacketDarkMat = cloth(JACKET_DARK, 0.82, 8);
+  const pantsMat = cloth(PANTS, 0.72, 7);
   const gearMat = mat(GEAR, 0.5, 0.2);
   const metalMat = mat(0x9aa2ab, 0.32, 0.92);
   const skinMat = mat(0x8a6a53, 0.8);
@@ -148,14 +160,14 @@ export function createClimber(name = 'PAULINE') {
   head.castShadow = true;
   neck.add(head);
 
-  const hood = new THREE.Mesh(new THREE.SphereGeometry(0.155, 18, 14, 0, Math.PI * 2, 0, Math.PI * 0.62), jacketMat);
+  const hood = new THREE.Mesh(new THREE.SphereGeometry(0.155, 20, 16, 0, Math.PI * 2, 0, Math.PI * 0.62), jacketMat);
   hood.position.set(0, -0.02, 0.045);
   hood.scale.set(1.05, 1.0, 1.12);
   neck.add(hood);
 
   const helmet = new THREE.Mesh(
     new THREE.SphereGeometry(0.145, 24, 18, 0, Math.PI * 2, 0, Math.PI * 0.56),
-    mat(HELMET, 0.62, 0.0)   // casque mat : un spéculaire trop dur efface le lettrage
+    new THREE.MeshStandardMaterial({ color: HELMET, roughness: 0.82, metalness: 0, envMapIntensity: 0.45 })
   );
   helmet.position.y = 0.03;
   helmet.scale.set(1.02, 1.08, 1.06);
@@ -171,7 +183,7 @@ export function createClimber(name = 'PAULINE') {
   const labelGeo = new THREE.SphereGeometry(
     0.1487, 44, 20,
     Math.PI / 2 - 0.80, 1.60,       // centré sur +Z : l'arrière du casque, face caméra
-    0.84, 0.36                      // bas de calotte : l'étiquette regarde en arrière, pas vers le ciel
+    0.90, 0.34                      // bas de calotte : l'étiquette regarde en arrière, pas vers le ciel
   );
   const label = new THREE.Mesh(labelGeo, new THREE.MeshStandardMaterial({
     map: TEX.helmetLabel(name),
@@ -199,7 +211,7 @@ export function createClimber(name = 'PAULINE') {
   pack.position.set(0, 0.18, 0.27);   // porté bas, comme un vrai sac d'alpi
   body.add(pack);
 
-  const packBody = new THREE.Mesh(new RoundedBoxGeometry(0.44, 0.64, 0.35, 4, 0.08), mat(0x2d3138, 0.86));
+  const packBody = new THREE.Mesh(new RoundedBoxGeometry(0.44, 0.64, 0.35, 4, 0.08), cloth(0x2d3138, 0.88, 5));
   packBody.castShadow = true; packBody.receiveShadow = true;
   pack.add(packBody);
 

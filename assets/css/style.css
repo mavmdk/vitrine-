@@ -53,6 +53,16 @@ body{
   100%{transform:translate(0,0)}
 }
 
+/* barres cinéma : elles se ferment pendant la séquence d'action */
+.bar{
+  position:fixed;left:0;right:0;z-index:3;pointer-events:none;
+  height:0;background:#04060a;
+  transition:height .8s cubic-bezier(.22,.61,.36,1);
+}
+.bar--top{top:0}
+.bar--bottom{bottom:0}
+body.is-cine .bar{height:7.2vh}
+
 /* vignette + impact flash */
 #flash{
   position:fixed;inset:0;z-index:2;pointer-events:none;

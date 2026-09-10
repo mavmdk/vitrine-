@@ -7,6 +7,7 @@ import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
 import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
 import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
 import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+import { BokehPass } from 'three/addons/postprocessing/BokehPass.js';
 
 import * as TEX from './textures.js';
 import * as W from './world.js';
@@ -15,6 +16,7 @@ import { createDumbbell, DUMBBELL_RADIUS } from './dumbbell.js';
 import { createLogo } from './logo.js';
 import { Burst, Trail, createChalkCloud, createShockwave } from './fx.js';
 import { buildPath, spinAt, cameraAt, atmosphereAt, P } from './timeline.js';
+import { createGradePass, createStreak, aimStreak } from './cinema.js';
 import { clamp, smoothstep, lerp } from './noise.js';
 
 const CLIMBER_X = 6, CLIMBER_Z = 210;   // pente locale ~48° : une face raide mais praticable
@@ -48,7 +50,9 @@ renderer.shadowMap.type = THREE.PCFSoftShadowMap;
 const scene = new THREE.Scene();
 scene.fog = new THREE.FogExp2(0xbcd3e8, 0.0012);
 
-const camera = new THREE.PerspectiveCamera(34, window.innerWidth / window.innerHeight, 0.1, 8000);
+// plan proche relevé et plan lointain rapproché : le flou de mise au point
+// lit le depth buffer, sa précision dépend directement du rapport near/far
+const camera = new THREE.PerspectiveCamera(34, window.innerWidth / window.innerHeight, 0.5, 5200);
 camera.position.set(0, 240, 130);
 
 const composer = new EffectComposer(
@@ -59,11 +63,21 @@ const composer = new EffectComposer(
   })
 );
 composer.addPass(new RenderPass(scene, camera));
+
+// profondeur de champ : c'est l'effet qui fait basculer une image 3D
+// du côté "photographié" plutôt que "calculé"
+const bokeh = new BokehPass(scene, camera, { focus: 12, aperture: 0.0004, maxblur: 0.009 });
+if (!lowPower) composer.addPass(bokeh);
+
 const bloom = new UnrealBloomPass(
-  new THREE.Vector2(window.innerWidth, window.innerHeight), 0.28, 0.55, 0.86
+  new THREE.Vector2(window.innerWidth, window.innerHeight), 0.28, 0.55, 0.94
 );
 composer.addPass(bloom);
 composer.addPass(new OutputPass());
+
+// étalonnage final : vignettage, aberration chromatique, courbe, grain
+const grade = createGradePass();
+composer.addPass(grade);
 
 /* --------------------------------------------------------------- montage */
 const mountainGroup = new THREE.Group();
@@ -71,7 +85,7 @@ scene.add(mountainGroup);
 
 let sunLight, climber, dumbbell, path, logo, gym, impactChalk;
 const sunDir = new THREE.Vector3();
-let cloudSea, fallClouds, trail, chalk, shockwave;
+let cloudSea, fallClouds, trail, chalk, shockwave, streak, shafts;
 const rockBursts = [];
 const snowBursts = [];
 
@@ -163,10 +177,14 @@ async function build() {
   trail = new Trail(smokeTex, lowPower ? 26 : 44);
   mountainGroup.add(trail.points);
 
+  streak = createStreak();
+  scene.add(streak);
+
   await step(94, 'la box');
   gym = W.createGym();
   scene.add(gym);
   impactChalk = gym.getObjectByName('impactChalk');
+  shafts = gym.getObjectByName('shafts');
 
   chalk = createChalkCloud(smokeTex);
   chalk.layers.forEach((l) => l.setOrigin(new THREE.Vector3(0, 0.22, 0)));
@@ -206,10 +224,16 @@ function updateChapters(p) {
     c.panel.style.transform = `translate3d(0, ${(1 - a) * 46}px, 0)`;
   }
   hintEl.classList.toggle('is-hidden', p > 0.015);
+  // format cinéma pendant la chute, plein cadre pour l'accroche et l'appel final
+  document.body.classList.toggle('is-cine', p > 0.085 && p < 0.895);
 }
 
 /* ------------------------------------------------------------- boucle */
-const camState = { pos: new THREE.Vector3(), look: new THREE.Vector3(), fov: 34 };
+const camState = {
+  pos: new THREE.Vector3(), look: new THREE.Vector3(), subject: new THREE.Vector3(),
+  fov: 34, aperture: 0.0004, maxblur: 0.009
+};
+const prevDumb = new THREE.Vector3();
 const dumbPos = new THREE.Vector3();
 const anchorWorld = new THREE.Vector3();
 const anchorQuat = new THREE.Quaternion();
@@ -336,15 +360,38 @@ function update(p, dt) {
   if (shockwave.visible) {
     const s = 0.6 + sw * 9;
     shockwave.scale.set(s, s, 1);
-    shockwave.material.opacity = (1 - sw) * 0.28;
+    shockwave.material.opacity = (1 - sw) * 0.18;
   }
   impactChalk.material.opacity = smoothstep(P.land, P.land + 0.02, p) * 0.55;
+
+  // les faisceaux se révèlent dans la poussière puis retombent
+  const dust = smoothstep(P.land, P.land + 0.025, p) * (1 - smoothstep(P.land + 0.06, P.end, p));
+  shafts.children.forEach((c, i) => {
+    c.material.opacity = dust * (0.20 + i * 0.06);
+    c.visible = dust > 0.01;
+  });
 
   /* flash d'impact */
   const flash = Math.max(0, 1 - Math.abs(p - P.land) / 0.012);
   flashEl.style.background = flash > 0.01
     ? `radial-gradient(120% 90% at 50% 45%, rgba(255,255,255,${flash * 0.55}) 0%, rgba(0,0,0,.45) 100%)`
     : 'radial-gradient(120% 90% at 50% 45%, rgba(0,0,0,0) 42%, rgba(0,0,0,.55) 100%)';
+
+  /* --- mise au point : elle suit le sujet, comme un point fait à la main --- */
+  if (!lowPower) {
+    const u = bokeh.uniforms;
+    u.focus.value = camera.position.distanceTo(camState.subject);
+    u.aperture.value = camState.aperture;
+    u.maxblur.value = camState.maxblur;
+  }
+  grade.uniforms.time.value = time;
+  grade.uniforms.aspect.value = camera.aspect;
+
+  /* --- traînée de vitesse de l'haltère --- */
+  path.sample(Math.max(0, p - 0.0035), prevDumb);
+  const streakForce = smoothstep(P.release + 0.02, P.release + 0.08, p)
+    * (1 - smoothstep(P.land - 0.06, P.land, p)) * 0.32;
+  aimStreak(streak, prevDumb, dumbPos, streakForce);
 
   /* --- le logo jaillit du sol --- */
   const ls = clamp((p - P.logo) / 0.085, 0, 1);
