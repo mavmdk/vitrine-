@@ -17,7 +17,7 @@ import { Burst, Trail, createChalkCloud, createShockwave } from './fx.js';
 import { buildPath, spinAt, cameraAt, atmosphereAt, P } from './timeline.js';
 import { clamp, smoothstep, lerp } from './noise.js';
 
-const CLIMBER_X = 6, CLIMBER_Z = 104;
+const CLIMBER_X = 6, CLIMBER_Z = 150;
 const AGE_ROCK = 26;      // conversion scroll -> secondes pour les impacts roche
 const AGE_CHALK = 15;
 
@@ -70,6 +70,7 @@ const mountainGroup = new THREE.Group();
 scene.add(mountainGroup);
 
 let sunLight, climber, dumbbell, path, logo, gym, impactChalk;
+const sunDir = new THREE.Vector3();
 let cloudSea, fallClouds, trail, chalk, shockwave;
 const rockBursts = [];
 const snowBursts = [];
@@ -86,8 +87,9 @@ async function build() {
   const { sun, envMap } = W.createSky(renderer, scene);
   scene.environment = envMap;
 
-  sunLight = new THREE.DirectionalLight(0xfff1dc, 5.6);
-  sunLight.position.copy(sun).multiplyScalar(300);
+  sunLight = new THREE.DirectionalLight(0xfff1dc, 7.6);
+  sunDir.copy(sun).normalize();
+  sunLight.position.copy(sunDir).multiplyScalar(300);
   sunLight.castShadow = true;
   sunLight.shadow.mapSize.set(lowPower ? 1024 : 2048, lowPower ? 1024 : 2048);
   sunLight.shadow.camera.near = 1;
@@ -100,7 +102,9 @@ async function build() {
   sunLight.shadow.normalBias = 0.05;
   scene.add(sunLight, sunLight.target);
 
-  const bounce = new THREE.HemisphereLight(0xcfe4ff, 0x5a5854, 0.32);
+  // la neige renvoie énormément de lumière : le rebond au sol est presque aussi
+  // clair que le ciel, c'est ce qui empêche les ombres de virer au noir
+  const bounce = new THREE.HemisphereLight(0xa9cdf6, 0xb3bcc6, 0.55);
   scene.add(bounce);
 
   await step(24, 'roche & neige');
@@ -220,14 +224,19 @@ function update(p, dt) {
   if (p <= P.release) {
     climber.updateWorldMatrix(true, true);
     climber.userData.anchor.getWorldPosition(anchorWorld);
+    // elle remonte doucement dans le sac : on la voit glisser avant de tomber
+    const slip = smoothstep(0.035, P.release, p);
     dumbPos.copy(anchorWorld);
+    dumbPos.y += slip * 0.20;
+    dumbPos.z += slip * 0.07;
   } else {
     path.sample(p, dumbPos);
   }
   dumbbell.position.copy(dumbPos);
   if (p <= P.release) {
     // rangée verticalement dans le sac : elle ne dépasse pas
-    dumbbell.rotation.set(0.18, 0.35, Math.PI / 2);
+    const slip = smoothstep(0.035, P.release, p);
+    dumbbell.rotation.set(0.18 + slip * 0.5, 0.35, Math.PI / 2 - slip * 0.35);
   } else {
     spinAt(p, quat);
     dumbbell.quaternion.copy(quat);
@@ -251,7 +260,7 @@ function update(p, dt) {
   scene.background = null;
   renderer.toneMappingExposure = atm.exposure;
   bloom.strength = atm.bloom;
-  sunLight.intensity = 5.6 * atm.sunIntensity;
+  sunLight.intensity = 7.6 * atm.sunIntensity;
   if ('environmentIntensity' in scene) {
     scene.environmentIntensity = p < P.cut ? 1 : 0.22;
   }
@@ -259,9 +268,7 @@ function update(p, dt) {
   // l'ombre du soleil suit le sujet
   if (p < P.cloudEnter) {
     sunLight.target.position.copy(p < P.release + 0.05 ? climber.position : dumbPos);
-    sunLight.position.copy(sunLight.target.position).add(
-      new THREE.Vector3(0.35, 0.86, 0.36).multiplyScalar(120)
-    );
+    sunLight.position.copy(sunLight.target.position).addScaledVector(sunDir, 140);
     sunLight.target.updateMatrixWorld();
   }
 
@@ -299,7 +306,7 @@ function update(p, dt) {
   if (shockwave.visible) {
     const s = 0.6 + sw * 9;
     shockwave.scale.set(s, s, 1);
-    shockwave.material.opacity = (1 - sw) * 0.5;
+    shockwave.material.opacity = (1 - sw) * 0.28;
   }
   impactChalk.material.opacity = smoothstep(P.land, P.land + 0.02, p) * 0.55;
 
@@ -315,11 +322,11 @@ function update(p, dt) {
   if (logo.visible) {
     // rebond élastique : il sort du sol et oscille avant de se poser
     const e = ls === 1 ? 1 : 1 - Math.pow(2, -9 * ls) * Math.cos((ls * 10 - 0.85) * 2.6);
-    logo.position.y = lerp(-1.4, 2.35, clamp(e, -0.2, 1.25));
+    logo.position.y = lerp(-1.4, 5.30, clamp(e, -0.2, 1.18));
     logo.rotation.x = (1 - ls) * -0.35;
     logo.userData.front.material.opacity = smoothstep(0, 0.25, ls);
     logo.userData.back.material.opacity = smoothstep(0, 0.25, ls) * 0.55;
-    logo.userData.glow.material.opacity = smoothstep(0.1, 0.7, ls) * 0.35;
+    logo.userData.glow.material.opacity = smoothstep(0.1, 0.7, ls) * 0.22;
   }
 }
 

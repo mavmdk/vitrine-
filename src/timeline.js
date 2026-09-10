@@ -28,9 +28,9 @@ export function buildPath(start) {
   for (const dz of steps) {
     z += dz;
     x += (rand() - 0.5) * dz * 0.55;
-    const y = surfaceHeight(x, z) + DUMBBELL_RADIUS * 1.5;
+    const y = surfaceHeight(x, z) + 0.85;   // garde au sol : elle reste lisible
     // hauteur du rebond : quelques dizaines de centimètres, pas dix mètres
-    stations.push({ pos: new THREE.Vector3(x, y, z), hop: 0.5 + rand() * 1.9 });
+    stations.push({ pos: new THREE.Vector3(x, y, z), hop: 1.3 + rand() * 2.4 });
   }
 
   const lens = [];
@@ -132,32 +132,45 @@ export function cameraAt(p, time, ctx, out) {
   const { climber, dumbbell, path } = ctx;
   const g = WORLD.gym;
 
-  /* --- A. contre-plongée sur l'alpiniste, cadré à droite ---
-     La caméra est en aval de la pente : le sujet se détache sur le ciel. */
-  const intro = smoothstep(0, 0.09, p);
-  _pos.set(
-    climber.x + lerp(3.4, 2.6, intro),
-    climber.y + lerp(-1.2, -0.5, intro),
-    climber.z + lerp(7.2, 5.8, intro)
+  /* --- A. deux temps.
+     A0 : macro sur le casque — on lit « PAULINE ♥ ».
+     A1 : recul au téléobjectif, le sommet écrase le grimpeur. */
+  const pull = smoothstep(0.030, 0.088, p);
+
+  const closeP = _tmpA.set(
+    climber.x + 1.18,
+    climber.y + 1.98,
+    climber.z + 2.42
   );
-  _look.set(climber.x - 1.5, climber.y + 1.35, climber.z - 0.2);
-  let fov = 40;
-  let shake = 0.014;
+  const wideP = _tmpB.set(
+    climber.x + 3.6,
+    climber.y - 13.0,
+    climber.z + 15.5
+  );
+  _pos.copy(closeP).lerp(wideP, pull);
+
+  const closeL = _tmpA.set(climber.x - 0.42, climber.y + 1.60, climber.z + 0.04);
+  const wideL = _tmpB.set(climber.x - 1.5, climber.y + 3.5, climber.z + 0.2);
+  _look.copy(closeL).lerp(wideL, pull);
+
+  let fov = lerp(32, 30, pull);
+  let shake = lerp(0.006, 0.02, pull);
 
   /* --- B. la caméra décroche et suit l'haltère --- */
   const follow = smoothstep(P.release, P.release + 0.06, p);
   if (follow > 0) {
     const chase = smoothstep(0.18, 0.42, p);
     _tmpB.copy(dumbbell).add(_tmpA.set(
-      lerp(1.3, 2.4, chase),
-      lerp(1.3, 2.2, chase),
-      lerp(3.0, 5.4, chase)
+      lerp(1.4, 2.1, chase),
+      lerp(2.0, 2.9, chase),      // au-dessus : le relief ne masque jamais l'objet
+      lerp(3.4, 5.0, chase)
     ));
     _pos.lerp(_tmpB, follow);
 
-    // on vise légèrement en avant : sensation de vitesse
-    path.sample(Math.min(P.cloudEnter, p + 0.010), _tmpB);
-    _tmpB.y -= 0.3;
+    // on vise l'objet, avec juste un soupçon d'avance : au-delà, il sort du cadre
+    path.sample(Math.min(P.cloudEnter, p + 0.004), _tmpB);
+    _tmpB.lerpVectors(dumbbell, _tmpB, 0.35);
+    _tmpB.y -= 0.15;
     _look.lerp(_tmpB, follow);
     fov = lerp(fov, 48, follow);
     shake = lerp(shake, 0.07, follow);
@@ -166,7 +179,7 @@ export function cameraAt(p, time, ctx, out) {
   /* --- C. dans les nuages : plan très serré --- */
   const inCloud = smoothstep(P.cloudEnter - 0.02, P.cloudEnter + 0.07, p);
   if (inCloud > 0) {
-    _tmpB.copy(dumbbell).add(_tmpA.set(0.85, 0.75, 1.9));
+    _tmpB.copy(dumbbell).add(_tmpA.set(0.85, 1.05, 1.9));
     _pos.lerp(_tmpB, inCloud);
     _look.lerp(dumbbell, inCloud);
     fov = lerp(fov, 54, inCloud);
@@ -188,12 +201,12 @@ export function cameraAt(p, time, ctx, out) {
     _look.y = lerp(dumbbell.y, g.y + 0.45, smoothstep(0.55, 1.0, drop));
 
     // recul + montée pour cadrer la marque
-    _tmpB.set(g.x, g.y + 3.1, g.z + 13.5);
+    _tmpB.set(g.x, g.y + 5.2, g.z + 15.4);
     _pos.lerp(_tmpB, fin);
-    _tmpB.set(g.x, g.y + 2.3, g.z);
+    _tmpB.set(g.x, g.y + 5.1, g.z);
     _look.lerp(_tmpB, fin);
 
-    fov = lerp(46, 38, fin);
+    fov = lerp(46, 36, fin);
     shake = lerp(0.045, 0.006, Math.max(drop * 0.5, fin));
   }
 
@@ -220,15 +233,15 @@ export function atmosphereAt(p) {
   if (p < P.cut) {
     _fogColor.copy(SKY_FOG).lerp(GREY_FOG, toGrey);
     density = lerp(0.0011, 0.085, toGrey * toGrey);
-    exposure = lerp(0.62, 1.05, toGrey);
-    bloom = lerp(0.34, 0.55, toGrey);
+    exposure = lerp(0.66, 1.05, toGrey);
+    bloom = lerp(0.30, 0.55, toGrey);
   } else {
     const out = smoothstep(P.cut, P.cut + 0.05, p);
     _fogColor.copy(GREY_FOG).lerp(GYM_FOG, out);
     _fogColor.lerp(CHALK_FOG, chalk * 0.8);
-    density = lerp(0.085, 0.014, out) + chalk * 0.045;
-    exposure = lerp(1.05, 0.92, out);
-    bloom = lerp(0.55, 0.6, out);
+    density = lerp(0.085, 0.014, out) + chalk * 0.020;
+    exposure = lerp(1.05, 1.0, out);
+    bloom = lerp(0.55, 0.30, out);
   }
 
   return {

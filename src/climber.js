@@ -235,7 +235,7 @@ export function createClimber(name = 'PAULINE') {
 
   // point d'ancrage de l'haltère dans le sac
   const anchor = new THREE.Object3D();
-  anchor.position.set(0.0, 0.08, 0.03);   // rangée au fond du sac
+  anchor.position.set(0.0, -0.15, 0.02);  // rangée au fond du sac, invisible au départ
   pack.add(anchor);
 
   /* ---- corde ---- */

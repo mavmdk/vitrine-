@@ -6,24 +6,28 @@ import { ridged, fbm, valueNoise, clamp, smoothstep, lerp, rng } from './noise.j
 import * as TEX from './textures.js';
 
 export const WORLD = {
-  radius: 620,        // rayon de la base de la montagne
-  peak: 470,          // hauteur brute avant modulation du bruit
-  cloudTop: 132,
-  cloudBottom: 66,
+  radius: 560,        // rayon de la base de la montagne
+  peak: 700,          // hauteur brute avant modulation du bruit
+  cloudTop: 150,      // la mer de nuages : le sommet en émerge
+  cloudBottom: 95,
   gym: new THREE.Vector3(0, 0, 196),
-  sunElevation: 22,   // degrés — soleil derrière la face : contre-jour
-  sunAzimuth: 172
+  sunElevation: 26,   // lumière rasante de côté : c'est elle qui sculpte le relief
+  sunAzimuth: 100
 };
 
 /* ------------------------------------------------------------------ relief */
 export function terrainHeight(x, z) {
   const r = Math.hypot(x, z) / WORLD.radius;
   if (r >= 1) return 0;
-  const cone = Math.pow(1 - r, 1.9);
-  const ridge = ridged(x * 0.0024 + 5.5, z * 0.0024 - 3.1, 6);
-  const rough = fbm(x * 0.011 - 2.2, z * 0.011 + 7.4, 4);
-  const talus = smoothstep(1.0, 0.55, r);
-  return WORLD.peak * cone * (0.40 + 0.80 * ridge) + 30 * rough * talus;
+  // profil dominant : le cône donne la pente générale (42-52°, une vraie face)
+  const cone = Math.pow(1 - r, 1.75);
+  // macro-relief : arêtes et épaulements à l'échelle du massif
+  const macro = 0.66 + 0.40 * ridged(x * 0.0026 + 5.5, z * 0.0026 - 3.1, 5);
+  // couloirs et goulets
+  const gully = (ridged(x * 0.0105 - 1.7, z * 0.0105 + 4.2, 5) - 0.35) * 20;
+  const rough = (fbm(x * 0.045 - 2.2, z * 0.045 + 7.4, 4) - 0.5) * 4.0;
+  const talus = smoothstep(1.0, 0.5, r);
+  return WORLD.peak * cone * macro + (gully + rough) * talus;
 }
 
 /* Détail haute fréquence, ajouté seulement sur la dalle proche de la caméra. */
@@ -51,10 +55,11 @@ export function createSky(renderer, scene) {
   sky.scale.setScalar(600000);
 
   const u = sky.material.uniforms;
-  u.turbidity.value = 2.2;
-  u.rayleigh.value = 2.55;
-  u.mieCoefficient.value = 0.004;
-  u.mieDirectionalG.value = 0.87;
+  // peu de diffusion : ciel d'altitude, bleu profond, sans voile blanc
+  u.turbidity.value = 1.6;
+  u.rayleigh.value = 1.15;
+  u.mieCoefficient.value = 0.0022;
+  u.mieDirectionalG.value = 0.80;
 
   const sun = new THREE.Vector3();
   const phi = THREE.MathUtils.degToRad(90 - WORLD.sunElevation);
@@ -71,6 +76,7 @@ export function createSky(renderer, scene) {
   scene.add(sky);           // re-parenté vers la scène principale
   pmrem.dispose();
 
+  WORLD.sunDir = sun.clone().normalize();
   return { sky, sun, envMap: rt.texture };
 }
 
@@ -80,9 +86,9 @@ function paintVertexColours(geo, opts = {}) {
   const nrm = geo.attributes.normal;
   const colors = new Float32Array(pos.count * 3);
   const snowLine = opts.snowLine ?? 40;
-  const rock = new THREE.Color(0x2b2d33);
-  const rockWarm = new THREE.Color(0x3e372f);
-  const snow = new THREE.Color(0xeef4ff).multiplyScalar(1.55);
+  const rock = new THREE.Color(0x53555d);
+  const rockWarm = new THREE.Color(0x6b6154);
+  const snow = new THREE.Color(0xeff5ff).multiplyScalar(1.25);
   const c = new THREE.Color();
 
   for (let i = 0; i < pos.count; i++) {
@@ -91,10 +97,10 @@ function paintVertexColours(geo, opts = {}) {
     const jitter = fbm(x * 0.05, z * 0.05, 3) - 0.5;
 
     // seuil serré : soit c'est enneigé, soit c'est de la roche nue
-    let snowAmt = smoothstep(0.50, 0.68, slope + jitter * 0.30);
-    snowAmt *= smoothstep(snowLine - 40, snowLine + 30, y);
-    // corniches et coulées de neige accrochées au raide, en altitude
-    snowAmt = clamp(snowAmt + smoothstep(200, 380, y) * 0.30 * (0.45 + jitter), 0, 1);
+    let snowAmt = smoothstep(0.55, 0.76, slope + jitter * 0.28);
+    snowAmt *= smoothstep(snowLine - 60, snowLine + 40, y);
+    // corniches et coulées accrochées au raide, en altitude
+    snowAmt = clamp(snowAmt + smoothstep(300, 460, y) * 0.28 * (0.45 + jitter), 0, 1);
 
     c.copy(rock).lerp(rockWarm, clamp(fbm(x * 0.02 + 3, z * 0.02, 3) * 1.6 - 0.2, 0, 1));
     c.lerp(snow, snowAmt);
@@ -108,8 +114,8 @@ function paintVertexColours(geo, opts = {}) {
 }
 
 export function createMountain(rockTex) {
-  const size = WORLD.radius * 2.6;
-  const seg = 288;
+  const size = WORLD.radius * 2.8;
+  const seg = 336;
   const geo = new THREE.PlaneGeometry(size, size, seg, seg);
   geo.rotateX(-Math.PI / 2);
 
@@ -119,11 +125,11 @@ export function createMountain(rockTex) {
     pos.setY(i, terrainHeight(x, z));
   }
   geo.computeVertexNormals();
-  paintVertexColours(geo, { snowLine: 60 });
+  paintVertexColours(geo, { snowLine: 130 });
 
-  const map = rockTex.map.clone(); map.needsUpdate = true; map.repeat.set(56, 56);
-  const nrm = rockTex.normalMap.clone(); nrm.needsUpdate = true; nrm.repeat.set(56, 56);
-  const rgh = rockTex.roughnessMap.clone(); rgh.needsUpdate = true; rgh.repeat.set(56, 56);
+  const map = rockTex.map.clone(); map.needsUpdate = true; map.repeat.set(96, 96);
+  const nrm = rockTex.normalMap.clone(); nrm.needsUpdate = true; nrm.repeat.set(96, 96);
+  const rgh = rockTex.roughnessMap.clone(); rgh.needsUpdate = true; rgh.repeat.set(96, 96);
 
   const mat = new THREE.MeshStandardMaterial({
     vertexColors: true,
@@ -154,11 +160,11 @@ export function createCliff(cx, cz, rockTex, snowTex) {
     pos.setY(i, surfaceHeight(x, z) + 0.12);
   }
   geo.computeVertexNormals();
-  paintVertexColours(geo, { snowLine: 60 });
+  paintVertexColours(geo, { snowLine: 130 });
 
-  const map = rockTex.map.clone(); map.needsUpdate = true; map.repeat.set(14, 18);
-  const nrm = rockTex.normalMap.clone(); nrm.needsUpdate = true; nrm.repeat.set(14, 18);
-  const rgh = rockTex.roughnessMap.clone(); rgh.needsUpdate = true; rgh.repeat.set(14, 18);
+  const map = rockTex.map.clone(); map.needsUpdate = true; map.repeat.set(38, 52);
+  const nrm = rockTex.normalMap.clone(); nrm.needsUpdate = true; nrm.repeat.set(38, 52);
+  const rgh = rockTex.roughnessMap.clone(); rgh.needsUpdate = true; rgh.repeat.set(38, 52);
 
   const mat = new THREE.MeshStandardMaterial({
     vertexColors: true,
@@ -187,7 +193,7 @@ export function createDistantRange() {
   for (let i = 0; i < 11; i++) {
     const a = rand() * Math.PI * 2;
     const dist = 1500 + rand() * 900;
-    const h = 190 + rand() * 260;
+    const h = 260 + rand() * 340;
     const r = 180 + rand() * 200;
     const cone = new THREE.ConeGeometry(r, h, 7 + ((rand() * 4) | 0), 3);
     const p = cone.attributes.position;
@@ -242,9 +248,9 @@ export function createCloudSea(smokeTex) {
 export function createFallClouds(smokeTex, path) {
   const g = new THREE.Group();
   const rand = rng(777);
-  for (let i = 0; i < 70; i++) {
+  for (let i = 0; i < 130; i++) {
     const t = rand();
-    const y = lerp(WORLD.cloudTop + 24, WORLD.cloudBottom - 30, t);
+    const y = lerp(WORLD.cloudTop + 24, WORLD.cloudBottom - 34, t);
     const s = new THREE.SpriteMaterial({
       map: smokeTex, transparent: true, depthWrite: false, fog: false
     });
@@ -252,12 +258,15 @@ export function createFallClouds(smokeTex, path) {
     s.color.setRGB(tint, tint, tint * 1.02);
     s.opacity = 0.34 + rand() * 0.5;
     const sp = new THREE.Sprite(s);
-    const sc = 26 + rand() * 90;
+    const sc = 9 + rand() * 34;
     sp.scale.set(sc, sc * (0.6 + rand() * 0.5), 1);
+    // réparties dans un couloir autour de la trajectoire, jamais toutes devant
+    const a = rand() * Math.PI * 2;
+    const rad = 4 + Math.pow(rand(), 0.7) * 46;
     sp.position.set(
-      path.x + (rand() - 0.5) * 130,
+      path.x + Math.cos(a) * rad + t * 8,
       y,
-      path.z + (rand() - 0.5) * 130
+      path.z + Math.sin(a) * rad + t * 40
     );
     g.add(sp);
   }
@@ -272,8 +281,8 @@ export function createGym() {
   g.name = 'gym';
 
   const floorTex = TEX.floorSet(512);
-  floorTex.map.repeat.set(22, 22);
-  floorTex.normalMap.repeat.set(22, 22);
+  floorTex.map.repeat.set(46, 46);
+  floorTex.normalMap.repeat.set(46, 46);
 
   const floor = new THREE.Mesh(
     new THREE.PlaneGeometry(140, 140, 1, 1),
@@ -282,9 +291,9 @@ export function createGym() {
       normalMap: floorTex.normalMap,
       normalScale: new THREE.Vector2(0.7, 0.7),
       color: 0xffffff,
-      roughness: 0.58,          // caoutchouc légèrement lustré : il accroche les reflets
+      roughness: 0.74,          // caoutchouc : juste ce qu'il faut de lustre
       metalness: 0.0,
-      envMapIntensity: 0.35
+      envMapIntensity: 0.18
     })
   );
   floor.rotation.x = -Math.PI / 2;
@@ -340,10 +349,10 @@ export function createGym() {
   g.add(room);
 
   // rampes lumineuses : hors du champ principal, elles servent de sources visibles
-  const stripMat = new THREE.MeshBasicMaterial({ color: 0xeaf1ff });
+  const stripMat = new THREE.MeshBasicMaterial({ color: 0x7e93ad });
   for (let i = -1; i <= 1; i++) {
-    const strip = new THREE.Mesh(new THREE.BoxGeometry(22, 0.22, 0.6), stripMat);
-    strip.position.set(0, 11.4, -6 + i * 9);
+    const strip = new THREE.Mesh(new THREE.BoxGeometry(18, 0.18, 0.5), stripMat);
+    strip.position.set(0, 13.2, -19 + i * 8);
     g.add(strip);
   }
 
@@ -372,8 +381,8 @@ export function createGym() {
   }
 
   /* --- éclairage : intensités en unités physiques (I / d²) --- */
-  const key = new THREE.SpotLight(0xffffff, 2600, 46, 0.72, 0.5, 1.7);
-  key.position.set(5.5, 12.5, 7);
+  const key = new THREE.SpotLight(0xffffff, 1000, 44, 0.78, 0.62, 1.75);
+  key.position.set(5.0, 11.0, 6.0);
   key.target.position.set(0, 0, 0);
   key.castShadow = true;
   key.shadow.mapSize.set(1024, 1024);
@@ -381,16 +390,16 @@ export function createGym() {
   key.shadow.normalBias = 0.02;
   g.add(key, key.target);
 
-  const rim = new THREE.SpotLight(0xa8c8ff, 1800, 60, 0.9, 0.7, 1.6);
+  const rim = new THREE.SpotLight(0xa8c8ff, 620, 56, 0.95, 0.8, 1.7);
   rim.position.set(-13, 10, -13);
   rim.target.position.set(0, 0.6, 0);
   g.add(rim, rim.target);
 
-  const warm = new THREE.PointLight(0xffb473, 320, 40, 1.9);
+  const warm = new THREE.PointLight(0xffb473, 150, 34, 1.9);
   warm.position.set(-7, 3.5, 11);
   g.add(warm);
 
-  const fill = new THREE.HemisphereLight(0x5d7392, 0x111316, 0.35);
+  const fill = new THREE.HemisphereLight(0x5d7392, 0x111316, 0.22);
   g.add(fill);
 
   g.visible = false;

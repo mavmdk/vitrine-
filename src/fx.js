@@ -130,9 +130,9 @@ export function createShockwave(texture) {
 export function createChalkCloud(smokeTex) {
   const group = new THREE.Group();
   const layers = [
-    new Burst({ count: 46, size: 2.6, texture: smokeTex, speed: 4.2, up: 0.55, gravity: -1.1, drag: 2.4, life: 3.4, opacity: 0.55, seed: 11, grow: 1.6 }),
-    new Burst({ count: 60, size: 1.35, texture: smokeTex, speed: 6.4, up: 0.5, gravity: -1.6, drag: 2.8, life: 2.8, opacity: 0.62, seed: 22, grow: 1.9 }),
-    new Burst({ count: 70, size: 0.6, texture: smokeTex, speed: 9.0, up: 0.42, gravity: -2.6, drag: 3.4, life: 2.2, opacity: 0.7, seed: 33, grow: 1.2 })
+    new Burst({ count: 46, size: 2.6, texture: smokeTex, speed: 4.2, up: 0.55, gravity: -1.1, drag: 2.4, life: 3.4, opacity: 0.42, seed: 11, grow: 1.6 }),
+    new Burst({ count: 60, size: 1.35, texture: smokeTex, speed: 6.4, up: 0.5, gravity: -1.6, drag: 2.8, life: 2.8, opacity: 0.48, seed: 22, grow: 1.9 }),
+    new Burst({ count: 70, size: 0.6, texture: smokeTex, speed: 9.0, up: 0.42, gravity: -2.6, drag: 3.4, life: 2.2, opacity: 0.55, seed: 33, grow: 1.2 })
   ];
   layers.forEach((l) => group.add(l.points));
   return { group, layers };

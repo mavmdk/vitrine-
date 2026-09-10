@@ -13,9 +13,9 @@ export function createLogo() {
   // ombre portée fake, décalée derrière : donne l'épaisseur
   const back = new THREE.Mesh(
     new THREE.PlaneGeometry(W, H),
-    new THREE.MeshBasicMaterial({ map: tex, transparent: true, color: 0x000000, opacity: 0.55, depthWrite: false })
+    new THREE.MeshBasicMaterial({ map: tex, transparent: true, color: 0x000000, opacity: 0.42, depthWrite: false })
   );
-  back.position.set(0.045, -0.045, -0.06);
+  back.position.set(0.03, -0.03, -0.05);
   g.add(back);
 
   const front = new THREE.Mesh(
@@ -29,7 +29,7 @@ export function createLogo() {
     map: TEX.dotSprite(128), color: 0xc8863f, transparent: true,
     opacity: 0.0, depthWrite: false, blending: THREE.AdditiveBlending
   }));
-  glow.scale.set(11, 5, 1);
+  glow.scale.set(8.5, 3.6, 1);
   glow.position.z = -0.4;
   g.add(glow);
 

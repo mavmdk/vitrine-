@@ -70,7 +70,7 @@ export function rockSet(size = 512) {
       hi.data[i + 3] = 255;
 
       // granite/schiste : gris froid, veiné, un peu de fer oxydé
-      const shade = 0.30 + h * 0.46;
+      const shade = 0.84 + h * 0.20;
       const rust = smoothstep(0.62, 0.92, fbm(u * 0.6 + 30, v * 0.6 + 30, 3));
       ci.data[i] = clamp(shade * 232 + rust * 42, 0, 255);
       ci.data[i + 1] = clamp(shade * 231 + rust * 16, 0, 255);
@@ -141,7 +141,7 @@ export function concreteSet(size = 512) {
       const g = fbm(u * 3, v * 3, 4) * 0.5 + valueNoise(x * 1.3, y * 1.3) * 0.5;
       const i = (y * size + x) * 4;
       const l = 0.80 + g * 0.16;
-      ci.data[i] = 214 * l; ci.data[i + 1] = 212 * l; ci.data[i + 2] = 206 * l; ci.data[i + 3] = 255;
+      ci.data[i] = 196 * l; ci.data[i + 1] = 194 * l; ci.data[i + 2] = 188 * l; ci.data[i + 3] = 255;
       hi.data[i] = hi.data[i + 1] = hi.data[i + 2] = g * 255; hi.data[i + 3] = 255;
     }
   }
@@ -370,10 +370,10 @@ export function floorSet(size = 512) {
   hctx.fillRect(0, 0, size, size);
 
   // granulat de caoutchouc
-  for (let i = 0; i < size * 22; i++) {
+  for (let i = 0; i < size * 16; i++) {
     const x = Math.random() * size, y = Math.random() * size;
-    const r = 0.6 + Math.random() * 1.9;
-    const g = 26 + Math.random() * 42;
+    const r = 0.5 + Math.random() * 1.3;
+    const g = 24 + Math.random() * 26;
     ctx.fillStyle = `rgba(${g},${g + 2},${g + 4},${0.35 + Math.random() * 0.5})`;
     ctx.beginPath(); ctx.arc(x, y, r, 0, 6.28); ctx.fill();
     hctx.fillStyle = Math.random() > 0.5 ? 'rgba(255,255,255,.28)' : 'rgba(0,0,0,.28)';

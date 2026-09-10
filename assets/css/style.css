@@ -178,9 +178,13 @@ body{
   transform:rotate(-45deg);
 }
 
-/* hero */
+/* hero : voile sombre côté gauche pour que le texte tienne sur la neige */
+.chapter--hero::before{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(100deg,rgba(4,6,9,.62) 0%,rgba(4,6,9,.34) 30%,rgba(4,6,9,0) 56%);
+}
 .panel--hero{
-  width:min(760px,94vw);
+  width:min(620px,94vw);
   background:transparent;border:0;backdrop-filter:none;-webkit-backdrop-filter:none;
   box-shadow:none;padding:0;
 }
@@ -190,7 +194,7 @@ body{
 }
 .panel--hero h1{
   margin:0 0 26px;
-  font-size:clamp(38px,7.2vw,86px);
+  font-size:clamp(38px,6.2vw,74px);
   line-height:.98;
   font-weight:600;
   letter-spacing:-.03em;
@@ -200,19 +204,21 @@ body{
 .lede{
   font-size:clamp(15px,1.5vw,18px);
   line-height:1.6;
-  color:rgba(255,255,255,.82);
-  max-width:52ch;margin:0 auto;
+  color:rgba(255,255,255,.86);
+  max-width:44ch;margin:0;
 }
+.chapter[data-side="center"] .lede{margin:0 auto}
 
 /* fog chapter reads on grey */
 .panel--fog{background:rgba(12,14,17,.34);border-color:rgba(255,255,255,.22)}
 
-/* final */
+/* final : la marque occupe le haut du cadre, l'appel à l'action le bas */
+.chapter--final{align-items:flex-end;padding-bottom:clamp(28px,7vh,80px)}
 .panel--final{
-  width:min(660px,94vw);
+  width:min(620px,94vw);
   background:rgba(8,9,12,.58);
   text-align:center;
-  padding:46px 40px 40px;
+  padding:34px 36px 32px;
 }
 .panel--final::before{display:none}
 .final__title{font-size:clamp(30px,4.4vw,52px);letter-spacing:-.02em}
