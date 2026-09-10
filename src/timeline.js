@@ -1,0 +1,242 @@
+/* La chorégraphie : trajectoire de l'haltère, caméra, atmosphère.
+   Tout est fonction du scroll normalisé p ∈ [0,1] — donc scrubable dans les deux sens. */
+
+import * as THREE from 'three';
+import { surfaceHeight, WORLD } from './world.js';
+import { DUMBBELL_RADIUS } from './dumbbell.js';
+import { clamp, smoothstep, lerp, rng } from './noise.js';
+
+export const P = {
+  release: 0.105,     // l'haltère quitte le sac
+  cloudEnter: 0.455,  // entrée dans la mer de nuages
+  cut: 0.615,         // bascule montagne -> box crossfit (écran plein gris)
+  land: 0.782,        // impact sur la magnésie
+  logo: 0.858,        // le logo jaillit du sol
+  end: 1.0
+};
+
+const GYM_ENTRY_Y = 12.5;   // hauteur à laquelle l'haltère réapparaît sous les nuages
+const _v = new THREE.Vector3();
+
+/* ------------------------------------------------ trajectoire rebondissante */
+export function buildPath(start) {
+  const rand = rng(1234);
+  const stations = [{ pos: start.clone(), hop: 0 }];
+
+  let x = start.x, z = start.z;
+  const steps = [3.5, 5, 7, 9, 12, 15, 19, 24, 30, 37];
+  for (const dz of steps) {
+    z += dz;
+    x += (rand() - 0.5) * dz * 0.55;
+    const y = surfaceHeight(x, z) + DUMBBELL_RADIUS * 1.5;
+    // hauteur du rebond : quelques dizaines de centimètres, pas dix mètres
+    stations.push({ pos: new THREE.Vector3(x, y, z), hop: 0.5 + rand() * 1.9 });
+  }
+
+  const lens = [];
+  let total = 0;
+  for (let i = 1; i < stations.length; i++) {
+    const l = Math.pow(stations[i].pos.distanceTo(stations[i - 1].pos), 0.82);
+    lens.push(l);
+    total += l;
+  }
+  let acc = 0;
+  stations[0].p = P.release;
+  for (let i = 1; i < stations.length; i++) {
+    acc += lens[i - 1];
+    stations[i].p = lerp(P.release, P.cloudEnter, acc / total);
+  }
+
+  const last = stations[stations.length - 1];
+  const cloudEnd = new THREE.Vector3(last.pos.x + 8, WORLD.cloudBottom - 30, last.pos.z + 40);
+  const impacts = stations.slice(1).map((s) => ({ p: s.p, pos: s.pos.clone() }));
+
+  function sample(p, out) {
+    out = out || _v;
+
+    if (p <= P.release) return out.copy(stations[0].pos);
+
+    /* 1. rebonds sur la face */
+    if (p < P.cloudEnter) {
+      let i = 0;
+      while (i < stations.length - 2 && p > stations[i + 1].p) i++;
+      const a = stations[i], b = stations[i + 1];
+      const s = clamp((p - a.p) / Math.max(1e-5, b.p - a.p), 0, 1);
+      out.lerpVectors(a.pos, b.pos, s);
+      // parabole entre deux impacts (le premier saut sort du sac, plus mou)
+      const hop = i === 0 ? 0.35 : b.hop;
+      out.y += hop * 4 * s * (1 - s);
+      return out;
+    }
+
+    /* 2. chute libre dans les nuages */
+    if (p < P.cut) {
+      const s = (p - P.cloudEnter) / (P.cut - P.cloudEnter);
+      out.lerpVectors(last.pos, cloudEnd, s * s * 0.8 + s * 0.2);
+      return out;
+    }
+
+    /* 3. box crossfit — repère local recalé sur WORLD.gym.
+          La coupure est invisible : l'écran est entièrement gris à cet instant. */
+    const g = WORLD.gym;
+    if (p < P.land) {
+      const s = (p - P.cut) / (P.land - P.cut);
+      const y = lerp(GYM_ENTRY_Y, DUMBBELL_RADIUS, s * s);   // accélération de la pesanteur
+      out.set(g.x + lerp(-0.9, 0, s), g.y + y, g.z + lerp(1.1, 0, s));
+      return out;
+    }
+
+    /* 4. impact : un rebond court puis repos */
+    const s = clamp((p - P.land) / 0.07, 0, 1);
+    const bounce = Math.abs(Math.sin(s * Math.PI * 1.7)) * (1 - s) * 0.55;
+    out.set(g.x, g.y + DUMBBELL_RADIUS + bounce, g.z + s * 0.26);
+    return out;
+  }
+
+  return { stations, impacts, sample, cloudEnd, last, entryY: GYM_ENTRY_Y };
+}
+
+/* ---------------------------------------------------------------- rotation */
+const _qSpin = new THREE.Quaternion();
+const _qRest = new THREE.Quaternion();
+const _eSpin = new THREE.Euler();
+const _eRest = new THREE.Euler(0.0, 0.42, 0.0);
+
+export function spinAt(p, out) {
+  const s = clamp((p - P.release) / (P.land - P.release), 0, 1);
+  const eased = 1 - Math.pow(1 - s, 1.85);
+  const a = eased * Math.PI * 2 * 19;
+  _eSpin.set(a * 1.0, a * 0.19, a * 0.44);
+  _qSpin.setFromEuler(_eSpin);
+  _qRest.setFromEuler(_eRest);
+  const settle = smoothstep(P.land - 0.008, P.land + 0.05, p);
+  return out.copy(_qSpin).slerp(_qRest, settle);
+}
+
+/* ---------------------------------------------------------------- caméra */
+const _pos = new THREE.Vector3();
+const _look = new THREE.Vector3();
+const _tmpA = new THREE.Vector3();
+const _tmpB = new THREE.Vector3();
+
+function handheld(time, amp, out) {
+  out.set(
+    Math.sin(time * 1.13) * 0.6 + Math.sin(time * 2.71) * 0.25,
+    Math.sin(time * 0.87 + 1.4) * 0.5 + Math.sin(time * 3.13) * 0.18,
+    Math.sin(time * 0.61 + 0.7) * 0.4
+  ).multiplyScalar(amp);
+  return out;
+}
+
+export function cameraAt(p, time, ctx, out) {
+  const { climber, dumbbell, path } = ctx;
+  const g = WORLD.gym;
+
+  /* --- A. contre-plongée sur l'alpiniste, cadré à droite ---
+     La caméra est en aval de la pente : le sujet se détache sur le ciel. */
+  const intro = smoothstep(0, 0.09, p);
+  _pos.set(
+    climber.x + lerp(3.4, 2.6, intro),
+    climber.y + lerp(-1.2, -0.5, intro),
+    climber.z + lerp(7.2, 5.8, intro)
+  );
+  _look.set(climber.x - 1.5, climber.y + 1.35, climber.z - 0.2);
+  let fov = 40;
+  let shake = 0.014;
+
+  /* --- B. la caméra décroche et suit l'haltère --- */
+  const follow = smoothstep(P.release, P.release + 0.06, p);
+  if (follow > 0) {
+    const chase = smoothstep(0.18, 0.42, p);
+    _tmpB.copy(dumbbell).add(_tmpA.set(
+      lerp(1.3, 2.4, chase),
+      lerp(1.3, 2.2, chase),
+      lerp(3.0, 5.4, chase)
+    ));
+    _pos.lerp(_tmpB, follow);
+
+    // on vise légèrement en avant : sensation de vitesse
+    path.sample(Math.min(P.cloudEnter, p + 0.010), _tmpB);
+    _tmpB.y -= 0.3;
+    _look.lerp(_tmpB, follow);
+    fov = lerp(fov, 48, follow);
+    shake = lerp(shake, 0.07, follow);
+  }
+
+  /* --- C. dans les nuages : plan très serré --- */
+  const inCloud = smoothstep(P.cloudEnter - 0.02, P.cloudEnter + 0.07, p);
+  if (inCloud > 0) {
+    _tmpB.copy(dumbbell).add(_tmpA.set(0.85, 0.75, 1.9));
+    _pos.lerp(_tmpB, inCloud);
+    _look.lerp(dumbbell, inCloud);
+    fov = lerp(fov, 54, inCloud);
+  }
+
+  /* --- D. box crossfit : caméra basse, on suit l'objet qui tombe --- */
+  if (p >= P.cut) {
+    const drop = clamp((p - P.cut) / (P.land - P.cut), 0, 1);
+    const fin = smoothstep(P.logo - 0.01, 0.97, p);
+
+    // position : légère poussée vers l'avant pendant la chute
+    _pos.set(
+      g.x + lerp(4.6, 3.5, drop),
+      g.y + lerp(1.9, 1.15, drop),
+      g.z + lerp(7.6, 6.0, drop)
+    );
+    // on suit l'haltère, puis on redescend sur le point d'impact
+    _look.copy(dumbbell);
+    _look.y = lerp(dumbbell.y, g.y + 0.45, smoothstep(0.55, 1.0, drop));
+
+    // recul + montée pour cadrer la marque
+    _tmpB.set(g.x, g.y + 3.1, g.z + 13.5);
+    _pos.lerp(_tmpB, fin);
+    _tmpB.set(g.x, g.y + 2.3, g.z);
+    _look.lerp(_tmpB, fin);
+
+    fov = lerp(46, 38, fin);
+    shake = lerp(0.045, 0.006, Math.max(drop * 0.5, fin));
+  }
+
+  handheld(time, shake, _tmpA);
+  out.pos.copy(_pos).add(_tmpA);
+  out.look.copy(_look).add(_tmpA.multiplyScalar(0.3));
+  out.fov = fov;
+  return out;
+}
+
+/* ------------------------------------------------------------- atmosphère */
+const _fogColor = new THREE.Color();
+const SKY_FOG = new THREE.Color(0xa9c6e4);
+const GREY_FOG = new THREE.Color(0xb2b6bb);
+const GYM_FOG = new THREE.Color(0x0b0d11);
+const CHALK_FOG = new THREE.Color(0xd2d7dd);
+
+export function atmosphereAt(p) {
+  const toGrey = smoothstep(0.36, P.cloudEnter + 0.05, p);
+  const chalk = smoothstep(P.land, P.land + 0.018, p) * (1 - smoothstep(P.land + 0.03, P.land + 0.13, p));
+
+  let density, exposure, bloom;
+
+  if (p < P.cut) {
+    _fogColor.copy(SKY_FOG).lerp(GREY_FOG, toGrey);
+    density = lerp(0.0011, 0.085, toGrey * toGrey);
+    exposure = lerp(0.62, 1.05, toGrey);
+    bloom = lerp(0.34, 0.55, toGrey);
+  } else {
+    const out = smoothstep(P.cut, P.cut + 0.05, p);
+    _fogColor.copy(GREY_FOG).lerp(GYM_FOG, out);
+    _fogColor.lerp(CHALK_FOG, chalk * 0.8);
+    density = lerp(0.085, 0.014, out) + chalk * 0.045;
+    exposure = lerp(1.05, 0.92, out);
+    bloom = lerp(0.55, 0.6, out);
+  }
+
+  return {
+    fogColor: _fogColor,
+    fogDensity: density,
+    exposure,
+    bloom,
+    sunIntensity: 1 - smoothstep(0.40, P.cloudEnter + 0.08, p),
+    grey: toGrey
+  };
+}
