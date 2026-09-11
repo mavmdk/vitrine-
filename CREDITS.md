@@ -6,17 +6,20 @@ les licences CC BY et CC BY-SA, c'est une obligation légale.
 
 | Fichier | Sujet | Auteur | Licence |
 |---|---|---|---|
-| `ascension-7300.*` | Cordée au-dessus de 7300 m (volet droit de l'accueil) | AngeliSherpa | [CC BY-SA 4.0](https://commons.wikimedia.org/wiki/File:Climbers_above_7300m.jpg) |
+| `accueil-montagne.*` | Cordée sur une arête effilée (volet droit de l'accueil) | Sylvain Mauroux | [Licence Unsplash](https://unsplash.com/photos/m6wbWMF6p9s) |
+| `accueil-box.*` | Athlète au-dessus d'une barre chargée (volet gauche de l'accueil) | Pexels | [Licence Pexels](https://www.pexels.com/photo/17770534/) |
 | `hero-k2.*` | Le K2 depuis le glacier du Baltoro | Svy123 | [CC BY 3.0](https://commons.wikimedia.org/wiki/File:K2_2006b.jpg) |
 | `ama-dablam.*` | Ama Dablam, Himalaya | PulkitPithvaWiki | [CC BY-SA 4.0](https://commons.wikimedia.org/wiki/File:Ama_Dablam_-_Himalayas_-_Nepal.jpg) |
-| `hero-arete.*` | Alpiniste sur une arête sommitale | Adha65 | [CC BY-SA 3.0](https://commons.wikimedia.org/wiki/File:Chopicalqui.jpg) |
 | `terrain-glacier.*` | Cordée dans la chute de séracs du Khumbu | Megaurab09 | [CC BY-SA 4.0](https://commons.wikimedia.org/wiki/File:Two_Mountaineers_Navigating_Giant_Dangerous_Khumbu_Icefall.jpg) |
 | `magnesie-mains.*` | Mains magnésiées | Abbottportraits | [CC BY-SA 3.0](https://commons.wikimedia.org/wiki/File:Chalked_Hands.jpg) |
-| `crossfit-barre.*` | Soulevé de terre en compétition CrossFit (volet gauche de l'accueil) | Lance Cpl. Christopher Johns, U.S. Marine Corps | Domaine public |
+| `crossfit-barre.*` | Soulevé de terre en compétition CrossFit (étape 02) | Lance Cpl. Christopher Johns, U.S. Marine Corps | Domaine public |
 | `crossfit-salle.*` | Épreuve du CrossFit Open | Sgt. Edward Eagerton, U.S. Army | Domaine public |
 
 ## Licences : ce qu'il faut savoir
 
+- **Licence Unsplash** et **licence Pexels** : usage commercial libre, aucune
+  attribution obligatoire, aucune redevance. Le crédit est laissé dans le pied
+  de page par correction envers les photographes, pas par obligation.
 - **Domaine public** : aucune contrainte. Les deux photos CrossFit sont des
   travaux officiels de l'armée américaine, libres de tout droit d'auteur.
 - **CC BY** : usage commercial libre, attribution obligatoire.

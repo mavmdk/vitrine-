@@ -91,8 +91,9 @@ node tools/images.mjs crossfit-barre ~/photo.jpg   # remplacer une photo
 
 | Emplacement | Où il apparaît |
 |---|---|
-| `ascension-7300` | accueil — volet droit (la montagne) |
-| `crossfit-barre` | accueil — volet gauche (la box) et étape 02 |
+| `accueil-montagne` | accueil — volet droit (la montagne) |
+| `accueil-box` | accueil — volet gauche (la box) |
+| `crossfit-barre` | étape 02 — programme personnalisé |
 | `terrain-glacier` | étape 01 — diagnostic |
 | `ama-dablam` | étape 04 — traverser le brouillard |
 | `magnesie-mains` | étape 05 — bandeau pleine largeur |

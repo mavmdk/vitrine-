@@ -22,13 +22,14 @@ try { sharp = require('sharp'); }
 catch { console.error('sharp manquant :  npm install sharp'); process.exit(1); }
 
 const EMPLACEMENTS = {
-  'ascension-7300':  [1700, 1000],
-  'crossfit-barre':  [1400, 900],
-  'terrain-glacier': [1920, 1200],
-  'ama-dablam':      [1400, 900],
-  'magnesie-mains':  [1760, 1100],
-  'hero-k2':         [1600, 1100],
-  'crossfit-salle':  [1400, 800]
+  'accueil-montagne': [1600, 1000],
+  'accueil-box':      [1400, 900],
+  'terrain-glacier':  [1920, 1200],
+  'crossfit-barre':   [1400, 900],
+  'ama-dablam':       [1400, 900],
+  'magnesie-mains':   [1760, 1100],
+  'hero-k2':          [1600, 1100],
+  'crossfit-salle':   [1400, 800]
 };
 
 const DIR = 'assets/img';

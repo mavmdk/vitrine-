@@ -29,13 +29,14 @@ try {
 /* Les emplacements de la page et la largeur attendue pour chacun.
    [grande largeur, largeur mobile] */
 const EMPLACEMENTS = {
-  'ascension-7300':  [1700, 1000, "accueil — volet droit (la montagne)"],
-  'crossfit-barre':  [1400, 900,  "accueil — volet gauche (la box) + étape 02"],
-  'terrain-glacier': [1920, 1200, "étape 01 — diagnostic"],
-  'ama-dablam':      [1400, 900,  "étape 04 — traverser le brouillard"],
-  'magnesie-mains':  [1760, 1100, "étape 05 — bandeau pleine largeur"],
-  'hero-k2':         [1600, 1100, "étape 06 — résultats mesurés"],
-  'crossfit-salle':  [1400, 800,  "vignette du menu déroulant"]
+  'accueil-montagne': [1600, 1000, "accueil — volet droit (la montagne)"],
+  'accueil-box':      [1400, 900,  "accueil — volet gauche (la box)"],
+  'terrain-glacier':  [1920, 1200, "étape 01 — diagnostic"],
+  'crossfit-barre':   [1400, 900,  "étape 02 — programme personnalisé"],
+  'ama-dablam':       [1400, 900,  "étape 04 — traverser le brouillard"],
+  'magnesie-mains':   [1760, 1100, "étape 05 — bandeau pleine largeur"],
+  'hero-k2':          [1600, 1100, "étape 06 — résultats mesurés"],
+  'crossfit-salle':   [1400, 800,  "vignette du menu déroulant"]
 };
 
 const QUALITE_WEBP = 76;
