@@ -18,12 +18,15 @@ import path from 'path';
 import { createRequire } from 'module';
 
 const require = createRequire(import.meta.url);
-let sharp;
-try {
-  sharp = require('sharp');
-} catch {
-  console.error("sharp n'est pas installé. Depuis le dossier du projet :\n\n  npm install sharp\n");
-  process.exit(1);
+
+/* sharp n'est chargé qu'au moment d'encoder : consulter la liste des
+   emplacements ne doit rien exiger. */
+function chargerSharp() {
+  try { return require('sharp'); }
+  catch {
+    console.error("\nsharp n'est pas installé. Depuis le dossier du projet :\n\n  npm install sharp\n");
+    process.exit(1);
+  }
 }
 
 /* Les emplacements de la page et la largeur attendue pour chacun.
@@ -68,6 +71,7 @@ const [large, mobile] = EMPLACEMENTS[emplacement];
 const DEST = 'assets/img';
 fs.mkdirSync(DEST, { recursive: true });
 
+const sharp = chargerSharp();
 const meta = await sharp(source).metadata();
 if (meta.width < large) {
   console.warn(`\n  Attention : la source fait ${meta.width}px de large, l'emplacement en attend ${large}px.`);
