@@ -62,7 +62,38 @@ src/ vendor/            code de l'ancienne version 3D
 | `index.html`, en-tête | les trois vignettes du menu déroulant |
 | `assets/img/` | **vos propres photos** — voir ci-dessous |
 
-### Les photos
+### Remplacer une photo
+
+Chaque photo occupe un **emplacement** nommé. Pour en changer, il suffit de
+fournir votre fichier : le script fabrique les trois variantes attendues
+(grande largeur en WebP, largeur mobile en WebP, repli JPEG) aux bonnes
+dimensions et sous les bons noms.
+
+```bash
+npm install sharp          # une seule fois
+node tools/images.mjs --list                       # voir les emplacements
+node tools/images.mjs crossfit-barre ~/photo.jpg   # remplacer une photo
+```
+
+| Emplacement | Où il apparaît |
+|---|---|
+| `ascension-7300` | accueil — volet droit (la montagne) |
+| `crossfit-barre` | accueil — volet gauche (la box) et étape 02 |
+| `terrain-glacier` | étape 01 — diagnostic |
+| `ama-dablam` | étape 04 — traverser le brouillard |
+| `magnesie-mains` | étape 05 — bandeau pleine largeur |
+| `hero-k2` | étape 06 — résultats mesurés |
+| `crossfit-salle` | vignette du menu déroulant |
+
+Le fichier source n'est jamais modifié, et rien d'autre n'est à toucher dans
+le code. Pensez simplement à mettre à jour `CREDITS.md` et la ligne de crédits
+du pied de page si l'auteur change.
+
+Les cadrages sont pilotés en CSS (`object-position`, `transform`) dans
+`assets/css/site.css` : si votre photo doit être recadrée autrement, c'est là
+que ça se règle, pas dans le fichier image.
+
+### Les photos livrées
 
 Celles livrées sont des images d'ambiance sous licence libre (Wikimedia
 Commons), leur attribution figure dans le pied de page et **doit y rester**.
