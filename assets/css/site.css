@@ -222,27 +222,67 @@ p{margin:0 0 16px}
   transform:rotate(-45deg);
 }
 
-/* ---------- héros ---------- */
-.hero{position:relative;min-height:100svh;display:flex;align-items:flex-end;isolation:isolate}
-.hero__img{position:absolute;inset:0;z-index:-2}
-.hero__img img{width:100%;height:100%;object-fit:cover;object-position:50% 46%}
-.hero::after{
-  content:"";position:absolute;inset:0;z-index:-1;
-  background:
-    linear-gradient(180deg,rgba(5,7,10,.62) 0%,rgba(5,7,10,.08) 34%,rgba(5,7,10,.72) 78%,rgba(5,7,10,.96) 100%),
-    linear-gradient(90deg,rgba(5,7,10,.66) 0%,rgba(5,7,10,.18) 48%,rgba(5,7,10,0) 74%);
+/* ---------- héros en diptyque ----------
+   Deux images plein écran côte à côte : la box à gauche, la haute montagne à
+   droite. Le texte est centré sur la couture, c'est elle qui porte le propos :
+   même méthode des deux côtés. */
+.hero{position:relative;min-height:100svh;display:flex;align-items:center;isolation:isolate;overflow:hidden}
+.split{position:absolute;inset:0;z-index:-2;display:grid;grid-template-columns:1fr 1fr}
+.split__half{position:relative;margin:0;overflow:hidden}
+.split__half img{width:100%;height:100%;object-fit:cover;display:block}
+
+/* cadrages : on garde le geste et l'échelle, on écarte les visages */
+.split__half--box img{object-position:50% 50%;transform:scale(1.24);transform-origin:50% 86%}
+.split__half--alp img{object-position:78% 52%;filter:brightness(1.22) contrast(1.04)}
+
+/* étalonnage : la box tire vers le froid métallique, la montagne reste bleue */
+.split__half--box::after,.split__half--alp::after{
+  content:"";position:absolute;inset:0;
 }
+.split__half--box::after{
+  background:
+    linear-gradient(180deg,rgba(5,7,10,.46) 0%,rgba(5,7,10,.06) 42%,rgba(5,7,10,.82) 100%),
+    linear-gradient(90deg,rgba(5,7,10,.22) 0%,rgba(5,7,10,.58) 100%);
+}
+.split__half--alp::after{
+  background:
+    linear-gradient(180deg,rgba(5,7,10,.30) 0%,rgba(5,7,10,0) 40%,rgba(5,7,10,.72) 100%),
+    linear-gradient(270deg,rgba(5,7,10,.06) 0%,rgba(5,7,10,.52) 100%);
+}
+
+/* la couture : un filet bronze, discret mais net */
+.split__half--alp::before{
+  content:"";position:absolute;left:0;top:0;bottom:0;width:1px;z-index:2;
+  background:linear-gradient(180deg,transparent,rgba(200,134,63,.55) 28%,rgba(200,134,63,.55) 72%,transparent);
+}
+
+/* libellés de chaque volet */
+.split__half figcaption{
+  position:absolute;bottom:clamp(18px,3vh,34px);z-index:2;
+  font-size:10px;letter-spacing:.34em;text-transform:uppercase;
+  color:rgba(238,240,243,.55);
+}
+.split__half--box figcaption{left:clamp(20px,5vw,80px)}
+.split__half--alp figcaption{right:clamp(20px,5vw,80px)}
+
+/* bloc de texte, centré sur la couture */
 .hero__inner{
-  width:100%;max-width:var(--maxw);margin:0 auto;
-  padding:0 var(--pad) clamp(56px,9vh,110px);
+  position:relative;width:100%;max-width:var(--maxw);margin:0 auto;
+  padding:clamp(70px,12vh,120px) var(--pad);
+  text-align:center;
+}
+.hero__inner::before{
+  content:"";position:absolute;inset:-6% -10%;z-index:-1;
+  background:radial-gradient(60% 52% at 50% 50%,rgba(5,7,10,.82) 0%,rgba(5,7,10,.55) 52%,rgba(5,7,10,0) 100%);
 }
 .hero h1{
-  font-size:clamp(38px,6.4vw,82px);
-  margin-bottom:26px;
-  text-shadow:0 14px 50px rgba(0,0,0,.5);
+  font-size:clamp(40px,7vw,92px);
+  margin-bottom:24px;
+  text-shadow:0 16px 60px rgba(0,0,0,.65);
 }
 .hero h1 em{font-style:normal;color:var(--bronze-lite)}
-.hero__cta{display:flex;gap:14px;flex-wrap:wrap;margin-top:30px}
+.hero .lede{margin-inline:auto}
+.hero__cta{display:flex;gap:14px;flex-wrap:wrap;margin-top:32px;justify-content:center}
 
 /* ---------- manifeste ---------- */
 .manifesto{
@@ -404,7 +444,22 @@ p{margin:0 0 16px}
   .stats{grid-template-columns:1fr 1fr}
   .stat:nth-child(2){border-right:0}
   .stat:nth-child(1),.stat:nth-child(2){border-bottom:1px solid var(--line)}
-  .hero__img img{object-position:52% 46%}
+  /* en portrait, le diptyque devient deux bandes superposées */
+  .split{grid-template-columns:1fr;grid-template-rows:1fr 1fr}
+  .split__half--alp::before{
+    left:0;right:0;top:0;bottom:auto;width:auto;height:1px;
+    background:linear-gradient(90deg,transparent,rgba(200,134,63,.55) 28%,rgba(200,134,63,.55) 72%,transparent);
+  }
+  .split__half--box::after{
+    background:linear-gradient(180deg,rgba(5,7,10,.42) 0%,rgba(5,7,10,.20) 40%,rgba(5,7,10,.88) 100%);
+  }
+  .split__half--alp::after{
+    background:linear-gradient(180deg,rgba(5,7,10,.72) 0%,rgba(5,7,10,.30) 40%,rgba(5,7,10,.90) 100%);
+  }
+  .split__half--box img{transform:scale(1.25);transform-origin:52% 70%}
+  .split__half figcaption{font-size:9px;letter-spacing:.26em}
+  .split__half--box figcaption{bottom:14px;top:auto;left:16px}
+  .split__half--alp figcaption{right:16px;bottom:14px}
 }
 @media (max-width:520px){
   .hero__cta{flex-direction:column;align-items:stretch}

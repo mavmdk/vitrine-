@@ -5,6 +5,10 @@ Site vitrine d'une activité de coaching sportif et de préparation physique.
 **Page d'accueil : `index.html`** — page éditoriale statique, photographies
 réelles, aucune animation au défilement, aucun JavaScript.
 
+L'accueil est un **diptyque** : la box à gauche, la haute montagne à droite,
+l'accroche centrée sur la couture. Les deux volets s'empilent en bandes sur
+écran étroit.
+
 ## Pourquoi cette forme
 
 La première version de ce dépôt était une expérience 3D pilotée au scroll
