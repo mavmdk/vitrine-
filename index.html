@@ -2,150 +2,277 @@
 <html lang="fr">
 <head>
 <meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>UPWARD — Coaching sportif haute performance</title>
-<meta name="description" content="UPWARD — méthode de coaching sportif : diagnostic, programme personnalisé, nutrition, suivi hebdomadaire. On ne descend jamais. On monte." />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>UPWARD — Coaching sportif &amp; préparation physique</title>
+<meta name="description" content="Diagnostic, programme personnalisé, nutrition, suivi hebdomadaire. La méthode UPWARD : un cadre écrit, des charges prescrites, des résultats mesurés." />
 <meta property="og:title" content="UPWARD — Coaching sportif haute performance" />
-<meta property="og:description" content="Diagnostic, programme personnalisé, nutrition, suivi hebdomadaire. On ne descend jamais. On monte." />
+<meta property="og:description" content="Tout le monde veut le sommet. Personne ne veut la montée." />
+<meta property="og:image" content="assets/img/hero-arete.jpg" />
 <meta property="og:type" content="website" />
-<meta name="theme-color" content="#05070a" />
-<link rel="stylesheet" href="assets/css/style.css" />
-<script type="importmap">
-{
-  "imports": {
-    "three": "./vendor/three/build/three.module.min.js",
-    "three/addons/": "./vendor/three/addons/"
-  }
-}
-</script>
+<meta name="theme-color" content="#0a0c10" />
+<link rel="preload" href="assets/fonts/inter-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin />
+<link rel="stylesheet" href="assets/css/site.css" />
 </head>
 <body>
 
-  <div id="loader" aria-hidden="true">
-    <div class="loader__mark">UPW<span>&#8593;</span>RD</div>
-    <div class="loader__bar"><i></i></div>
-    <div class="loader__hint">préparation de l'ascension…</div>
+<a class="skip" href="#methode">Aller au contenu</a>
+
+<header class="nav">
+  <a class="mark" href="#top" aria-label="UPWARD, accueil">UPW<i class="arw" aria-hidden="true"></i>RD</a>
+  <nav class="nav__links" aria-label="Principal">
+    <a href="#methode">La méthode</a>
+    <a href="#formules">Formules</a>
+    <a href="#contact">Contact</a>
+  </nav>
+  <a class="btn btn--sm" href="#contact">Réserver un appel</a>
+</header>
+
+<!-- ================= HERO ================= -->
+<section class="hero" id="top">
+  <picture class="hero__img">
+    <source type="image/webp" media="(max-width: 900px)" srcset="assets/img/hero-arete@1200.webp" />
+    <source type="image/webp" srcset="assets/img/hero-arete.webp" />
+    <img src="assets/img/hero-arete.jpg" alt="Un alpiniste seul progresse sur une arête de neige vers un sommet." width="1920" height="1303" fetchpriority="high" />
+  </picture>
+
+  <div class="hero__inner">
+    <p class="eyebrow">Coaching sportif &amp; préparation physique</p>
+    <h1>Tout le monde<br />veut le sommet.<br /><em>Personne ne veut<br />la montée.</em></h1>
+    <p class="lede">La montée, c'est le programme. Les charges, le tempo, les semaines
+      où rien ne bouge. C'est là que je travaille.</p>
+    <div class="hero__cta">
+      <a class="btn" href="#contact">Réserver mon appel</a>
+      <a class="btn btn--ghost" href="#methode">Voir la méthode</a>
+    </div>
   </div>
+</section>
 
-  <canvas id="scene"></canvas>
-  <div id="grain" aria-hidden="true"></div>
-  <div class="bar bar--top" aria-hidden="true"></div>
-  <div class="bar bar--bottom" aria-hidden="true"></div>
-  <div id="flash" aria-hidden="true"></div>
+<!-- ================= MANIFESTE ================= -->
+<section class="manifesto">
+  <p class="rule" aria-hidden="true"></p>
+  <p>Un programme qui n'est pas écrit n'est pas un programme.<br />
+     Une séance qui n'est pas mesurée n'est pas un entraînement.<br />
+     <em>Ce qui ne se compte pas ne progresse pas.</em></p>
+</section>
 
-  <header class="topbar">
-    <a class="brand" href="#">UPW<span>&#8593;</span>RD</a>
-    <a class="cta cta--ghost" href="#contact">Réserver un appel</a>
-  </header>
+<!-- ================= MÉTHODE ================= -->
+<div id="methode" class="anchor"></div>
+<section class="section section--head">
+  <p class="eyebrow">La méthode</p>
+  <h2>Six étapes. Aucune n'est facultative.</h2>
+</section>
 
-  <div class="scrollhint" id="scrollhint"><span>défiler</span><i></i></div>
+<!-- 01 -->
+<section class="row">
+  <figure class="row__media">
+    <picture>
+      <source type="image/webp" media="(max-width: 900px)" srcset="assets/img/terrain-glacier@1200.webp" />
+      <source type="image/webp" srcset="assets/img/terrain-glacier.webp" />
+      <img src="assets/img/terrain-glacier.jpg" alt="Deux alpinistes traversent un glacier crevassé, minuscules face à la paroi." loading="lazy" width="1920" height="1348" />
+    </picture>
+  </figure>
+  <div class="row__text">
+    <p class="num">01</p>
+    <h3>Diagnostic complet</h3>
+    <p>Bilan postural, force maximale, capacités cardio, mobilité, sommeil, charge
+      de travail réelle. On mesure avant de programmer. Aucune séance n'est écrite
+      tant que le point de départ n'est pas chiffré.</p>
+    <ul class="bul">
+      <li>Tests de force &amp; d'endurance</li>
+      <li>Analyse posturale et mobilité</li>
+      <li>Historique de blessures</li>
+    </ul>
+  </div>
+</section>
 
-  <main id="scroll">
+<!-- 02 -->
+<section class="row row--flip">
+  <figure class="row__media row__media--tall">
+    <picture>
+      <source type="image/webp" media="(max-width: 900px)" srcset="assets/img/haltere-main@700.webp" />
+      <source type="image/webp" srcset="assets/img/haltere-main.webp" />
+      <img src="assets/img/haltere-main.jpg" alt="Une main saisit un haltère devant un rack de salle." loading="lazy" width="1100" height="1650" />
+    </picture>
+  </figure>
+  <div class="row__text">
+    <p class="num">02</p>
+    <h3>Programme personnalisé</h3>
+    <p>Un plan écrit pour <em>ton</em> corps, <em>ton</em> emploi du temps,
+      <em>ton</em> matériel. Charges, séries, tempo, temps de repos : tout est
+      prescrit. La progression est planifiée semaine après semaine, jamais improvisée.</p>
+    <ul class="bul">
+      <li>Périodisation sur 12 semaines</li>
+      <li>3 à 6 séances par semaine</li>
+      <li>Adapté salle, box ou maison</li>
+    </ul>
+  </div>
+</section>
 
-    <section class="chapter chapter--hero" data-from="0.00" data-to="0.10" data-side="left">
-      <div class="panel panel--hero">
-        <p class="eyebrow">Coaching sportif &amp; préparation physique</p>
-        <h1>Tout le monde<br />veut le sommet.<br /><em>Personne ne veut<br />la montée.</em></h1>
-        <p class="lede">La méthode UPWARD : un cadre, un programme, un suivi. Rien d'autre que ce qui te fait progresser.</p>
-      </div>
-    </section>
+<!-- 03 — carte sans photo -->
+<section class="section cards">
+  <article class="card">
+    <p class="num">03</p>
+    <h3>Nutrition &amp; récupération</h3>
+    <p>Pas de régime. Des repères : apports, timing, hydratation, sommeil.
+      La récupération n'est pas une pause, c'est là que la progression se fabrique.</p>
+    <ul class="bul">
+      <li>Calibrage calorique &amp; macros</li>
+      <li>Protocoles de récupération</li>
+      <li>Gestion des phases de charge</li>
+    </ul>
+  </article>
+  <article class="card card--accent">
+    <p class="num">Le principe</p>
+    <h3>Tu ne progresses pas&nbsp;à&nbsp;l'entraînement.</h3>
+    <p>Tu progresses entre deux entraînements — si le sommeil, les apports et la
+      charge le permettent. C'est pour ça que le programme ne s'arrête pas à la
+      porte de la salle.</p>
+  </article>
+</section>
 
-    <section class="chapter" data-from="0.11" data-to="0.22" data-side="left">
-      <div class="panel">
-        <span class="num">01</span>
-        <h2>Diagnostic complet</h2>
-        <p>Bilan postural, force maximale, capacités cardio, mobilité, sommeil, charge de travail réelle. On mesure avant de programmer. Aucune séance n'est écrite tant que le point de départ n'est pas chiffré.</p>
-        <ul class="bul">
-          <li>Tests de force &amp; d'endurance</li>
-          <li>Analyse posturale et mobilité</li>
-          <li>Historique de blessures</li>
-        </ul>
-      </div>
-    </section>
+<!-- 04 -->
+<section class="row">
+  <figure class="row__media row__media--cool">
+    <picture>
+      <source type="image/webp" media="(max-width: 900px)" srcset="assets/img/brouillard-cretes@1100.webp" />
+      <source type="image/webp" srcset="assets/img/brouillard-cretes.webp" />
+      <img src="assets/img/brouillard-cretes.jpg" alt="Crêtes émergeant d'une mer de nuages à l'aube." loading="lazy" width="1760" height="1173" />
+    </picture>
+  </figure>
+  <div class="row__text">
+    <p class="num">04</p>
+    <h3>Traverser le brouillard</h3>
+    <p>Il y a toujours un moment où tu ne vois plus rien : plateau, fatigue, doute.
+      C'est exactement là que le suivi compte. Point hebdomadaire écrit,
+      réajustement des charges, cap tenu.</p>
+    <ul class="bul">
+      <li>Check-in hebdomadaire écrit</li>
+      <li>Réajustement des charges</li>
+      <li>Accès direct au coach</li>
+    </ul>
+  </div>
+</section>
 
-    <section class="chapter" data-from="0.23" data-to="0.34" data-side="right">
-      <div class="panel">
-        <span class="num">02</span>
-        <h2>Programme personnalisé</h2>
-        <p>Un plan écrit pour <em>ton</em> corps, <em>ton</em> emploi du temps, <em>ton</em> matériel. Charges, séries, tempo, temps de repos : tout est prescrit. Progression planifiée semaine après semaine, jamais improvisée.</p>
-        <ul class="bul">
-          <li>Périodisation sur 12 semaines</li>
-          <li>Séances 3 à 6 fois / semaine</li>
-          <li>Adapté salle, box ou maison</li>
-        </ul>
-      </div>
-    </section>
+<!-- 05 — bandeau pleine page -->
+<section class="band">
+  <picture class="band__img">
+    <source type="image/webp" media="(max-width: 900px)" srcset="assets/img/magnesie-mains@1100.webp" />
+    <source type="image/webp" srcset="assets/img/magnesie-mains.webp" />
+    <img src="assets/img/magnesie-mains.jpg" alt="Des mains couvertes de magnésie, la poussière en suspension." loading="lazy" width="1760" height="1174" />
+  </picture>
+  <blockquote class="band__quote">
+    <p class="num">05 — Le terrain</p>
+    <p>«&nbsp;La magnésie, le chrono, la barre. On sort de la théorie : chaque séance
+      a un objectif mesurable et un critère de réussite.&nbsp;»</p>
+  </blockquote>
+</section>
 
-    <section class="chapter" data-from="0.35" data-to="0.46" data-side="left">
-      <div class="panel">
-        <span class="num">03</span>
-        <h2>Nutrition &amp; récupération</h2>
-        <p>Pas de régime. Des repères : apports, timing, hydratation, sommeil. La récupération n'est pas une pause, c'est là que la progression se fabrique.</p>
-        <ul class="bul">
-          <li>Calibrage calorique &amp; macros</li>
-          <li>Protocoles de récupération</li>
-          <li>Gestion des phases de charge</li>
-        </ul>
-      </div>
-    </section>
+<!-- 06 -->
+<section class="row row--flip">
+  <figure class="row__media">
+    <picture>
+      <source type="image/webp" media="(max-width: 900px)" srcset="assets/img/sommet-panorama@1100.webp" />
+      <source type="image/webp" srcset="assets/img/sommet-panorama.webp" />
+      <img src="assets/img/sommet-panorama.jpg" alt="Panorama de sommets enneigés vus depuis une arête." loading="lazy" width="1760" height="1173" />
+    </picture>
+  </figure>
+  <div class="row__text">
+    <p class="num">06</p>
+    <h3>Résultats mesurés</h3>
+    <p>Photos, mensurations, records, ressenti. Tous les 30 jours, on compare aux
+      données du diagnostic. Ce qui progresse, on l'accélère. Ce qui bloque, on
+      le change.</p>
+    <ul class="bul">
+      <li>Bilan tous les 30 jours</li>
+      <li>Records de force suivis</li>
+      <li>Ajustement du plan</li>
+    </ul>
+  </div>
+</section>
 
-    <section class="chapter" data-from="0.47" data-to="0.60" data-side="right">
-      <div class="panel panel--fog">
-        <span class="num">04</span>
-        <h2>Traverser le brouillard</h2>
-        <p>Il y a toujours un moment où tu ne vois plus rien : plateau, fatigue, doute. C'est exactement là que le suivi compte. Check-in hebdomadaire, ajustements, cap tenu.</p>
-        <ul class="bul">
-          <li>Point hebdomadaire écrit</li>
-          <li>Réajustement des charges</li>
-          <li>Accès direct au coach</li>
-        </ul>
-      </div>
-    </section>
+<!-- ================= CHIFFRES ================= -->
+<section class="stats">
+  <div class="stat"><b>12</b><span>semaines par cycle</span></div>
+  <div class="stat"><b>30</b><span>jours entre deux bilans</span></div>
+  <div class="stat"><b>7j/7</b><span>accès direct au coach</span></div>
+  <div class="stat"><b>0</b><span>séance improvisée</span></div>
+</section>
 
-    <section class="chapter" data-from="0.61" data-to="0.74" data-side="left">
-      <div class="panel">
-        <span class="num">05</span>
-        <h2>Le sol, la barre, le travail</h2>
-        <p>Le terrain de jeu : haltères, magnésie, chrono. On sort de la théorie. Chaque séance a un objectif mesurable et un critère de réussite.</p>
-        <ul class="bul">
-          <li>Technique filmée &amp; corrigée</li>
-          <li>Charges et records suivis</li>
-          <li>Objectifs mesurables</li>
-        </ul>
-      </div>
-    </section>
+<!-- ================= FORMULES ================= -->
+<div id="formules" class="anchor"></div>
+<section class="section section--head">
+  <p class="eyebrow">Formules</p>
+  <h2>Trois niveaux d'accompagnement.</h2>
+</section>
 
-    <section class="chapter" data-from="0.78" data-to="0.90" data-side="right">
-      <div class="panel">
-        <span class="num">06</span>
-        <h2>Résultats mesurés</h2>
-        <p>Photos, mensurations, records, ressenti. Tous les 30 jours, on compare aux données du diagnostic. Ce qui progresse, on l'accélère. Ce qui bloque, on le change.</p>
-        <ul class="bul">
-          <li>Bilan tous les 30 jours</li>
-          <li>Records de force suivis</li>
-          <li>Ajustement du plan</li>
-        </ul>
-      </div>
-    </section>
+<section class="section plans">
+  <article class="plan">
+    <h3>Essentiel</h3>
+    <p class="plan__price">— €<span>/ mois</span></p>
+    <p class="plan__for">Tu sais t'entraîner, il te manque le cadre.</p>
+    <ul class="bul">
+      <li>Diagnostic initial</li>
+      <li>Programme écrit sur 12 semaines</li>
+      <li>Point mensuel</li>
+    </ul>
+    <a class="btn btn--ghost btn--full" href="#contact">En savoir plus</a>
+  </article>
 
-    <section class="chapter chapter--final" data-from="0.93" data-to="1.00" data-side="center">
-      <div class="panel panel--final" id="contact">
-        <h2 class="final__title">Prêt à monter&nbsp;?</h2>
-        <p class="lede">Premier appel offert : on regarde ton niveau, ton objectif, et si la méthode te correspond. Sans engagement.</p>
-        <div class="final__actions">
-          <a class="cta" href="mailto:contact@upward.coach">Réserver mon appel</a>
-          <a class="cta cta--ghost" href="#">Voir les formules</a>
-        </div>
-        <p class="fineprint">UPWARD — coaching individuel, en présentiel &amp; à distance.</p>
-      </div>
-    </section>
+  <article class="plan plan--feature">
+    <p class="plan__tag">Le plus choisi</p>
+    <h3>Ascension</h3>
+    <p class="plan__price">— €<span>/ mois</span></p>
+    <p class="plan__for">Tu veux progresser vite, sans te blesser.</p>
+    <ul class="bul">
+      <li>Tout Essentiel</li>
+      <li>Check-in hebdomadaire écrit</li>
+      <li>Nutrition &amp; récupération</li>
+      <li>Technique filmée et corrigée</li>
+    </ul>
+    <a class="btn btn--full" href="#contact">Réserver mon appel</a>
+  </article>
 
-  </main>
+  <article class="plan">
+    <h3>Sommet</h3>
+    <p class="plan__price">— €<span>/ mois</span></p>
+    <p class="plan__for">Objectif daté : compétition, test, échéance.</p>
+    <ul class="bul">
+      <li>Tout Ascension</li>
+      <li>Séances en présentiel</li>
+      <li>Accès direct 7j/7</li>
+      <li>Pilotage jusqu'à l'échéance</li>
+    </ul>
+    <a class="btn btn--ghost btn--full" href="#contact">En savoir plus</a>
+  </article>
+</section>
 
-  <noscript>
-    <div class="noscript">Cette page utilise une animation 3D. Activez JavaScript pour la découvrir.</div>
-  </noscript>
+<!-- ================= MARQUE + CTA ================= -->
+<div id="contact" class="anchor"></div>
+<section class="finale">
+  <p class="finale__mark" aria-label="UPWARD">UPW<i class="arw arw--lg" aria-hidden="true"></i>RD</p>
+  <h2>Prêt à monter&nbsp;?</h2>
+  <p class="lede">Premier appel offert : on regarde ton niveau, ton objectif, et si
+    la méthode te correspond. Sans engagement.</p>
+  <div class="hero__cta">
+    <a class="btn" href="mailto:contact@upward.coach">Réserver mon appel</a>
+    <a class="btn btn--ghost" href="tel:+33000000000">Appeler directement</a>
+  </div>
+  <p class="fineprint">Coaching individuel, en présentiel &amp; à distance.</p>
+</section>
 
-  <script type="module" src="src/main.js"></script>
+<footer class="foot">
+  <div class="foot__row">
+    <p class="mark mark--foot">UPW<i class="arw" aria-hidden="true"></i>RD</p>
+    <p class="foot__ded">pour Pauline <span aria-hidden="true">&#9829;</span></p>
+  </div>
+  <p class="foot__credits">
+    Photographies&nbsp;: Adha65 (CC BY-SA 3.0) · Megaurab09 (CC BY-SA 4.0) ·
+    Nenad Stojkovic (CC BY 2.0) · Abbottportraits (CC BY-SA 3.0) ·
+    Kalablink (CC BY-SA 4.0) · BrettA343 (CC BY-SA 4.0) — via Wikimedia Commons.
+  </p>
+  <p class="foot__legal">© <span>2026</span> UPWARD — Tous droits réservés ·
+    <a href="#top">Haut de page</a></p>
+</footer>
+
 </body>
 </html>

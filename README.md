@@ -1,85 +1,81 @@
-# vitrine
+# UPWARD — vitrine
 
-Vitrine scrollytelling 3D pour la marque de coaching sportif **UPWARD**.
+Site vitrine d'une activité de coaching sportif et de préparation physique.
 
-## Le principe
+**Page d'accueil : `index.html`** — page éditoriale statique, photographies
+réelles, aucune animation au défilement, aucun JavaScript.
 
-Une seule page. Plus on descend, plus la scène se transforme :
+## Pourquoi cette forme
 
-| Scroll | Scène |
-|---|---|
-| 0 → 10 % | Plan serré sur un alpiniste, de dos, sur une face enneigée. Son casque porte « PAULINE ♥ ». |
-| 10 → 45 % | Une haltère s'échappe de son sac, dévale la face, rebondit sur la roche (éclats + poudreuse à chaque impact). |
-| 45 → 62 % | Traversée de la mer de nuages : l'écran devient entièrement gris. |
-| 62 → 80 % | Sortie sous les nuages : la box crossfit. L'haltère finit sa chute. |
-| 80 % | Impact sur un tas de magnésie → explosion de poudre blanche. |
-| 86 → 100 % | Le logo UPWARD jaillit du sol et se stabilise. Appel à l'action. |
-
-Les blocs de méthodologie (diagnostic, programme personnalisé, nutrition,
-suivi, résultats) apparaissent en alternance à gauche et à droite pendant
-toute la descente.
-
-## Technique
-
-- **three.js r169** (embarqué dans `vendor/`, aucun CDN requis).
-- Ciel physique (diffusion de Rayleigh/Mie) + env map PMREM générée depuis ce
-  ciel : c'est ce qui donne les reflets réalistes sur le chrome et la neige.
-- Relief généré proceduralement (bruit ridged multifractal), colorisé par
-  pente et altitude, plus une dalle haute densité sous l'alpiniste pour le
-  plan rapproché.
-- Toutes les textures sont générées en canvas au chargement (roche, neige,
-  béton moucheté, moletage chrome, magnésie, sol caoutchouc) : **zéro asset
-  binaire dans le dépôt**.
-- Rendu : tone mapping ACES filmique, ombres PCF douces, bloom, brouillard
-  exponentiel animé, MSAA 4x, grain de film en surimpression.
-- Toute l'animation est une **fonction pure du scroll** : on peut scruber en
-  avant comme en arrière sans jamais désynchroniser la scène.
-- Bruit à base de hash entier (`Math.imul`) plutôt que de `Math.sin` :
-  environ 5x plus rapide, c'est ce qui dimensionne le temps de chargement.
-- **Repli sans WebGL** : si le rendu 3D échoue (pilote refusé, pas de WebGL),
-  la page bascule en version statique — le contenu reste lisible.
-- `?p=0.42` dans l'URL saute directement à une étape : pratique pour régler
-  un plan sans faire défiler.
-
-## Lancer en local
-
-```bash
-npx http-server -p 8080 .
-# puis ouvrir http://127.0.0.1:8080
-```
-
-Un simple serveur de fichiers statiques suffit (les modules ES imposent
-`http://`, un double-clic sur `index.html` ne fonctionnera pas).
+La première version de ce dépôt était une expérience 3D pilotée au scroll
+(elle reste consultable : `experience.html`). Elle a été écartée : le rendu
+temps réel dans un navigateur ne peut pas atteindre le photoréalisme attendu
+sur un corps humain, et le prospect d'un coach ne juge pas une démo technique,
+il juge la crédibilité. Une photographie réelle bien cadrée fait le travail que
+la 3D ne faisait pas.
 
 ## Structure
 
 ```
-index.html            page + blocs de contenu
-assets/css/style.css  interface, panneaux, loader
-src/main.js           orchestration, boucle de rendu, scroll
-src/world.js          ciel, montagne, falaise, nuages, box crossfit
-src/climber.js        l'alpiniste et sa pose animée
-src/dumbbell.js       l'haltère
-src/timeline.js       trajectoire, caméra, atmosphère
-src/fx.js             particules (éclats, poudreuse, magnésie)
-src/textures.js       textures procédurales
-src/noise.js          bruit fbm / ridged
-src/logo.js           la marque qui sort du sol
-vendor/three/         three.js r169 + addons
+index.html              la vitrine
+experience.html         l'ancienne version 3D (archivée, fonctionnelle)
+assets/css/site.css     l'intégralité du style de la vitrine
+assets/fonts/           Inter, auto-hébergée (voir RGPD plus bas)
+assets/img/             les photographies, en WebP + repli JPEG
+CREDITS.md              attribution des photographies — obligation légale
+src/ vendor/            code de l'ancienne version 3D
 ```
 
-## Note sur la marque
+## Ce qui a été décidé et pourquoi
 
-L'haltère reprend le design béton/chrome de la référence fournie, mais porte
-le marquage **UPWARD** — pas de logo de marque tierce sur un support
-commercial.
+- **Zéro JavaScript.** Pas de dépendance, pas de script à maintenir, pas de
+  blocage si un script échoue. La page s'affiche même sur un mobile ancien.
+- **Police auto-hébergée.** Charger Google Fonts depuis les serveurs de Google
+  transmet l'adresse IP des visiteurs aux États-Unis ; un tribunal allemand
+  (Munich, 2022) a jugé cette pratique non conforme au RGPD et d'autres
+  décisions ont suivi en Europe. Les fichiers Inter sont donc servis depuis ce
+  dépôt.
+- **Images en WebP avec repli JPEG**, deux largeurs chacune : 8,8 Mo de sources
+  ramenés à 2,1 Mo livrés.
+- **Recadrages en CSS** (`object-position`), jamais dans les fichiers : les
+  photos sous licence CC BY-SA ne sont donc pas modifiées, ce qui évite
+  l'obligation de partage à l'identique.
+- **Pas d'animation au défilement** : la page est lue, pas jouée.
 
 ## À personnaliser avant mise en ligne
 
-- `index.html` : l'adresse du bouton « Réserver mon appel »
-  (`mailto:contact@upward.coach`) et le lien « Voir les formules ».
-- `src/main.js` : `createClimber('PAULINE')` — le prénom écrit sur le casque.
-- `src/world.js` : `WORLD.sunElevation` / `sunAzimuth` pour changer l'heure
-  de la journée sur la montagne.
-- Les textes des six chapitres sont dans `index.html`, chacun avec sa plage
-  de scroll (`data-from` / `data-to`, en fraction de la page).
+| Où | Quoi |
+|---|---|
+| `index.html`, section `formules` | **les trois tarifs** — ils sont volontairement affichés « — € » |
+| `index.html`, section `contact` | l'adresse e-mail (`contact@upward.coach`) et le numéro de téléphone |
+| `index.html`, pied de page | l'année, la mention légale, la dédicace |
+| `assets/img/` | **vos propres photos** — voir ci-dessous |
+
+### Les photos
+
+Celles livrées sont des images d'ambiance sous licence libre (Wikimedia
+Commons), leur attribution figure dans le pied de page et **doit y rester**.
+Elles tiennent la direction artistique, mais ce ne sont pas les vôtres : une
+vitrine de coaching convertit sur la preuve — vous, vos clients, votre salle.
+Remplacez les fichiers en gardant les mêmes noms, tout suivra.
+
+Détail des licences et des auteurs : [`CREDITS.md`](CREDITS.md).
+
+## Mise en ligne
+
+Le site est entièrement statique : n'importe quel hébergement de fichiers
+convient (Netlify, Cloudflare Pages, GitHub Pages, un simple FTP). Aucune
+étape de compilation.
+
+En local :
+
+```bash
+npx http-server -p 8080 .
+```
+
+## L'ancienne version 3D
+
+`experience.html` fonctionne toujours : montagne procédurale, chute d'une
+haltère en 3D, traversée des nuages, impact sur la magnésie, logo qui jaillit
+du sol. Elle peut servir de page d'ambiance secondaire ou être supprimée
+(`experience.html`, `src/`, `vendor/`).

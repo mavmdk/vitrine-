@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>UPWARD — Coaching sportif haute performance</title>
+<meta name="description" content="UPWARD — méthode de coaching sportif : diagnostic, programme personnalisé, nutrition, suivi hebdomadaire. On ne descend jamais. On monte." />
+<meta property="og:title" content="UPWARD — Coaching sportif haute performance" />
+<meta property="og:description" content="Diagnostic, programme personnalisé, nutrition, suivi hebdomadaire. On ne descend jamais. On monte." />
+<meta property="og:type" content="website" />
+<meta name="theme-color" content="#05070a" />
+<link rel="stylesheet" href="assets/css/style.css" />
+<script type="importmap">
+{
+  "imports": {
+    "three": "./vendor/three/build/three.module.min.js",
+    "three/addons/": "./vendor/three/addons/"
+  }
+}
+</script>
+</head>
+<body>
+
+  <div id="loader" aria-hidden="true">
+    <div class="loader__mark">UPW<span>&#8593;</span>RD</div>
+    <div class="loader__bar"><i></i></div>
+    <div class="loader__hint">préparation de l'ascension…</div>
+  </div>
+
+  <canvas id="scene"></canvas>
+  <div id="grain" aria-hidden="true"></div>
+  <div class="bar bar--top" aria-hidden="true"></div>
+  <div class="bar bar--bottom" aria-hidden="true"></div>
+  <div id="flash" aria-hidden="true"></div>
+
+  <header class="topbar">
+    <a class="brand" href="#">UPW<span>&#8593;</span>RD</a>
+    <a class="cta cta--ghost" href="#contact">Réserver un appel</a>
+  </header>
+
+  <div class="scrollhint" id="scrollhint"><span>défiler</span><i></i></div>
+
+  <main id="scroll">
+
+    <section class="chapter chapter--hero" data-from="0.00" data-to="0.10" data-side="left">
+      <div class="panel panel--hero">
+        <p class="eyebrow">Coaching sportif &amp; préparation physique</p>
+        <h1>Tout le monde<br />veut le sommet.<br /><em>Personne ne veut<br />la montée.</em></h1>
+        <p class="lede">La méthode UPWARD : un cadre, un programme, un suivi. Rien d'autre que ce qui te fait progresser.</p>
+      </div>
+    </section>
+
+    <section class="chapter" data-from="0.11" data-to="0.22" data-side="left">
+      <div class="panel">
+        <span class="num">01</span>
+        <h2>Diagnostic complet</h2>
+        <p>Bilan postural, force maximale, capacités cardio, mobilité, sommeil, charge de travail réelle. On mesure avant de programmer. Aucune séance n'est écrite tant que le point de départ n'est pas chiffré.</p>
+        <ul class="bul">
+          <li>Tests de force &amp; d'endurance</li>
+          <li>Analyse posturale et mobilité</li>
+          <li>Historique de blessures</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="chapter" data-from="0.23" data-to="0.34" data-side="right">
+      <div class="panel">
+        <span class="num">02</span>
+        <h2>Programme personnalisé</h2>
+        <p>Un plan écrit pour <em>ton</em> corps, <em>ton</em> emploi du temps, <em>ton</em> matériel. Charges, séries, tempo, temps de repos : tout est prescrit. Progression planifiée semaine après semaine, jamais improvisée.</p>
+        <ul class="bul">
+          <li>Périodisation sur 12 semaines</li>
+          <li>Séances 3 à 6 fois / semaine</li>
+          <li>Adapté salle, box ou maison</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="chapter" data-from="0.35" data-to="0.46" data-side="left">
+      <div class="panel">
+        <span class="num">03</span>
+        <h2>Nutrition &amp; récupération</h2>
+        <p>Pas de régime. Des repères : apports, timing, hydratation, sommeil. La récupération n'est pas une pause, c'est là que la progression se fabrique.</p>
+        <ul class="bul">
+          <li>Calibrage calorique &amp; macros</li>
+          <li>Protocoles de récupération</li>
+          <li>Gestion des phases de charge</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="chapter" data-from="0.47" data-to="0.60" data-side="right">
+      <div class="panel panel--fog">
+        <span class="num">04</span>
+        <h2>Traverser le brouillard</h2>
+        <p>Il y a toujours un moment où tu ne vois plus rien : plateau, fatigue, doute. C'est exactement là que le suivi compte. Check-in hebdomadaire, ajustements, cap tenu.</p>
+        <ul class="bul">
+          <li>Point hebdomadaire écrit</li>
+          <li>Réajustement des charges</li>
+          <li>Accès direct au coach</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="chapter" data-from="0.61" data-to="0.74" data-side="left">
+      <div class="panel">
+        <span class="num">05</span>
+        <h2>Le sol, la barre, le travail</h2>
+        <p>Le terrain de jeu : haltères, magnésie, chrono. On sort de la théorie. Chaque séance a un objectif mesurable et un critère de réussite.</p>
+        <ul class="bul">
+          <li>Technique filmée &amp; corrigée</li>
+          <li>Charges et records suivis</li>
+          <li>Objectifs mesurables</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="chapter" data-from="0.78" data-to="0.90" data-side="right">
+      <div class="panel">
+        <span class="num">06</span>
+        <h2>Résultats mesurés</h2>
+        <p>Photos, mensurations, records, ressenti. Tous les 30 jours, on compare aux données du diagnostic. Ce qui progresse, on l'accélère. Ce qui bloque, on le change.</p>
+        <ul class="bul">
+          <li>Bilan tous les 30 jours</li>
+          <li>Records de force suivis</li>
+          <li>Ajustement du plan</li>
+        </ul>
+      </div>
+    </section>
+
+    <section class="chapter chapter--final" data-from="0.93" data-to="1.00" data-side="center">
+      <div class="panel panel--final" id="contact">
+        <h2 class="final__title">Prêt à monter&nbsp;?</h2>
+        <p class="lede">Premier appel offert : on regarde ton niveau, ton objectif, et si la méthode te correspond. Sans engagement.</p>
+        <div class="final__actions">
+          <a class="cta" href="mailto:contact@upward.coach">Réserver mon appel</a>
+          <a class="cta cta--ghost" href="#">Voir les formules</a>
+        </div>
+        <p class="fineprint">UPWARD — coaching individuel, en présentiel &amp; à distance.</p>
+      </div>
+    </section>
+
+  </main>
+
+  <noscript>
+    <div class="noscript">Cette page utilise une animation 3D. Activez JavaScript pour la découvrir.</div>
+  </noscript>
+
+  <script type="module" src="src/main.js"></script>
+</body>
+</html>
