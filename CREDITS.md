@@ -1,31 +1,47 @@
 # Crédits photographiques
 
-Toutes les photographies de la vitrine proviennent de Wikimedia Commons et sont
-publiées sous licence libre. **L'attribution est une obligation légale** : elle
-figure dans le pied de page du site et ne doit pas en être retirée.
+Toutes les photographies proviennent de Wikimedia Commons. **L'attribution
+figure dans le pied de page du site et ne doit pas en être retirée** : pour
+les licences CC BY et CC BY-SA, c'est une obligation légale.
 
-| Fichier | Auteur | Licence | Source |
+| Fichier | Sujet | Auteur | Licence |
 |---|---|---|---|
-| `assets/img/hero-arete.*` | Adha65 | CC BY-SA 3.0 | [Chopicalqui](https://commons.wikimedia.org/wiki/File:Chopicalqui.jpg) |
-| `assets/img/terrain-glacier.*` | Megaurab09 | CC BY-SA 4.0 | [Khumbu Icefall](https://commons.wikimedia.org/wiki/File:Two_Mountaineers_Navigating_Giant_Dangerous_Khumbu_Icefall.jpg) |
-| `assets/img/haltere-main.*` | Nenad Stojkovic | CC BY 2.0 | [Hand holding dumbbell](https://commons.wikimedia.org/wiki/File:Close-up_Hand_holding_dumbbell_in_gym.jpg) |
-| `assets/img/magnesie-mains.*` | Abbottportraits | CC BY-SA 3.0 | [Chalked Hands](https://commons.wikimedia.org/wiki/File:Chalked_Hands.jpg) |
-| `assets/img/brouillard-cretes.*` | Kalablink | CC BY-SA 4.0 | [Beyond the Clouds](https://commons.wikimedia.org/wiki/File:Beyond_the_Clouds.jpg) |
-| `assets/img/sommet-panorama.*` | BrettA343 | CC BY-SA 4.0 | [Mt. Forbes](https://commons.wikimedia.org/wiki/File:Mt._Forbes_buttress;_2_US_Climbers_on_West_Ridge_route.jpg) |
+| `hero-k2.*` | Le K2 depuis le glacier du Baltoro | Svy123 | [CC BY 3.0](https://commons.wikimedia.org/wiki/File:K2_2006b.jpg) |
+| `ama-dablam.*` | Ama Dablam, Himalaya | PulkitPithvaWiki | [CC BY-SA 4.0](https://commons.wikimedia.org/wiki/File:Ama_Dablam_-_Himalayas_-_Nepal.jpg) |
+| `hero-arete.*` | Alpiniste sur une arête sommitale | Adha65 | [CC BY-SA 3.0](https://commons.wikimedia.org/wiki/File:Chopicalqui.jpg) |
+| `terrain-glacier.*` | Cordée dans la chute de séracs du Khumbu | Megaurab09 | [CC BY-SA 4.0](https://commons.wikimedia.org/wiki/File:Two_Mountaineers_Navigating_Giant_Dangerous_Khumbu_Icefall.jpg) |
+| `magnesie-mains.*` | Mains magnésiées | Abbottportraits | [CC BY-SA 3.0](https://commons.wikimedia.org/wiki/File:Chalked_Hands.jpg) |
+| `crossfit-barre.*` | Soulevé de terre en compétition CrossFit | Lance Cpl. Christopher Johns, U.S. Marine Corps | Domaine public |
+| `crossfit-salle.*` | Épreuve du CrossFit Open | Sgt. Edward Eagerton, U.S. Army | Domaine public |
 
-## Ce qu'il faut savoir
+## Licences : ce qu'il faut savoir
 
-- **CC BY** : utilisation commerciale libre, attribution obligatoire.
+- **Domaine public** : aucune contrainte. Les deux photos CrossFit sont des
+  travaux officiels de l'armée américaine, libres de tout droit d'auteur.
+- **CC BY** : usage commercial libre, attribution obligatoire.
 - **CC BY-SA** : idem, plus partage à l'identique **si vous modifiez la photo**.
-  L'intégrer telle quelle dans une page n'est pas une modification.
-- Recadrer ou étalonner une photo CC BY-SA revient à créer une œuvre dérivée :
-  dans ce cas la photo modifiée doit rester sous la même licence. Les recadrages
-  du site sont faits en CSS (`object-position`), donc le fichier source n'est
-  jamais modifié.
+  L'afficher telle quelle dans une page n'est pas une modification.
+- Tous les recadrages du site sont faits en CSS (`object-position`,
+  `transform`). Les fichiers sources ne sont jamais retouchés, donc aucune
+  œuvre dérivée n'est créée et l'obligation de partage à l'identique ne
+  s'applique pas.
+
+## Droit à l'image — à lire avant de changer un recadrage
+
+Le droit d'auteur et le droit à l'image sont deux choses différentes. Une photo
+peut être libre de droits **et** montrer une personne dont le visage ne peut pas
+être exploité commercialement sans son accord écrit.
+
+C'est pour cette raison que la photo de soulevé de terre est **cadrée sous le
+visage** (mains, barre, jambes) : le geste reste lisible, la personne n'est pas
+identifiable. Si vous élargissez ce cadrage, vous réintroduisez le risque.
+
+La même prudence vaut pour les vignettes du menu : les personnes y sont assez
+petites pour ne pas être identifiables.
 
 ## À terme
 
-Ces photos sont de bonnes images d'ambiance, mais **ce ne sont pas les vôtres**.
-Le jour où vous avez des photos de vos propres séances — vous, vos clients, votre
-salle — remplacez-les : une vitrine de coaching convertit sur la preuve, pas sur
-le décor. Les noms de fichiers sont stables, il suffit d'écraser les fichiers.
+Ces photos tiennent la direction artistique, mais ce ne sont pas les vôtres.
+Le jour où vous avez vos propres images de séances — avec des autorisations
+signées pour les personnes reconnaissables — écrasez les fichiers en gardant
+les mêmes noms : tout le site suivra.

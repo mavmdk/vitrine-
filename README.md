@@ -37,9 +37,15 @@ src/ vendor/            code de l'ancienne version 3D
   dépôt.
 - **Images en WebP avec repli JPEG**, deux largeurs chacune : 8,8 Mo de sources
   ramenés à 2,1 Mo livrés.
-- **Recadrages en CSS** (`object-position`), jamais dans les fichiers : les
-  photos sous licence CC BY-SA ne sont donc pas modifiées, ce qui évite
-  l'obligation de partage à l'identique.
+- **Recadrages en CSS** (`object-position`, `transform`), jamais dans les
+  fichiers : les photos sous licence CC BY-SA ne sont donc pas modifiées, ce
+  qui évite l'obligation de partage à l'identique.
+- **Aucun visage identifiable en gros plan.** Le droit d'auteur et le droit à
+  l'image sont deux choses distinctes : une photo libre de droits peut montrer
+  une personne dont le visage n'est pas exploitable commercialement sans son
+  accord. Les cadrages ont été choisis en conséquence — voir `CREDITS.md`.
+- **Menu déroulant à vignettes**, en CSS pur : ouverture au survol et au focus
+  clavier (`:focus-within`), et accordéon `<details>` sur écran étroit.
 - **Pas d'animation au défilement** : la page est lue, pas jouée.
 
 ## À personnaliser avant mise en ligne
@@ -49,6 +55,7 @@ src/ vendor/            code de l'ancienne version 3D
 | `index.html`, section `formules` | **les trois tarifs** — ils sont volontairement affichés « — € » |
 | `index.html`, section `contact` | l'adresse e-mail (`contact@upward.coach`) et le numéro de téléphone |
 | `index.html`, pied de page | l'année, la mention légale, la dédicace |
+| `index.html`, en-tête | les trois vignettes du menu déroulant |
 | `assets/img/` | **vos propres photos** — voir ci-dessous |
 
 ### Les photos

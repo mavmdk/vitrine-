@@ -100,13 +100,86 @@ a{color:inherit}
   font-size:14px;font-weight:600;letter-spacing:.36em;text-transform:uppercase;
   text-decoration:none;white-space:nowrap;
 }
-.nav__links{display:flex;gap:26px;margin-left:auto}
+.nav__links{display:flex;align-items:center;gap:26px;margin-left:auto}
 .nav__links a{
   font-size:12px;letter-spacing:.16em;text-transform:uppercase;
   color:var(--text-dim);text-decoration:none;padding:6px 0;
   border-bottom:1px solid transparent;transition:color .25s,border-color .25s;
 }
 .nav__links a:hover{color:var(--text);border-color:var(--bronze)}
+
+
+/* ---------- menu déroulant à vignettes ----------
+   Ouverture au survol ET au focus clavier : aucun JavaScript, donc rien qui
+   puisse casser, et le menu reste accessible à la tabulation. */
+.drop{position:relative}
+.drop__trigger{
+  display:inline-flex;align-items:center;gap:7px;
+  font-size:12px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--text-dim);text-decoration:none;padding:6px 0;
+  border-bottom:1px solid transparent;transition:color .25s,border-color .25s;
+}
+.drop:hover .drop__trigger,.drop:focus-within .drop__trigger{color:var(--text);border-color:var(--bronze)}
+.drop__caret{
+  width:6px;height:6px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;
+  transform:rotate(45deg) translate(-2px,-2px);transition:transform .25s;
+}
+.drop:hover .drop__caret,.drop:focus-within .drop__caret{transform:rotate(225deg) translate(-2px,-2px)}
+
+.mega{
+  position:absolute;top:100%;left:50%;
+  transform:translate(-50%,8px);
+  width:min(760px,92vw);
+  display:grid;grid-template-columns:repeat(3,1fr);gap:14px;
+  padding:16px;margin-top:14px;
+  background:rgba(10,12,16,.94);
+  border:1px solid var(--line);
+  box-shadow:0 40px 90px -40px rgba(0,0,0,.95);
+  backdrop-filter:blur(14px);
+  -webkit-backdrop-filter:blur(14px);
+  opacity:0;visibility:hidden;pointer-events:none;
+  transition:opacity .22s ease,transform .28s cubic-bezier(.22,.61,.36,1),visibility .22s;
+}
+/* zone tampon : évite que le menu se referme dans l'espace entre le lien et le panneau */
+.mega::before{content:"";position:absolute;top:-16px;left:0;right:0;height:16px}
+.drop:hover .mega,.drop:focus-within .mega{
+  opacity:1;visibility:visible;pointer-events:auto;transform:translate(-50%,0);
+}
+.mega__card{text-decoration:none;display:block;color:inherit}
+.mega__img{display:block;overflow:hidden;background:var(--ink-2);margin-bottom:12px}
+.mega__img img{
+  width:100%;height:132px;object-fit:cover;
+  filter:saturate(.9) contrast(1.03);
+  transition:transform .5s cubic-bezier(.22,.61,.36,1),filter .35s;
+}
+.mega__card:hover .mega__img img{transform:scale(1.06);filter:saturate(1) contrast(1.06)}
+.mega__label{
+  display:block;font-size:13px;font-weight:600;letter-spacing:.02em;margin-bottom:6px;
+  text-transform:none;
+}
+.mega__card:hover .mega__label{color:var(--bronze-lite)}
+.mega__desc{display:block;font-size:12px;line-height:1.5;color:var(--text-dimmer);text-transform:none;letter-spacing:0}
+
+/* ---------- menu accordéon (écrans étroits) ---------- */
+.burger{display:none;margin-left:auto;position:relative}
+.burger>summary{
+  list-style:none;cursor:pointer;display:flex;flex-direction:column;justify-content:center;
+  gap:5px;width:40px;height:40px;padding:0 8px;
+}
+.burger>summary::-webkit-details-marker{display:none}
+.burger>summary i{display:block;height:1.5px;background:var(--text);transition:background .25s}
+.burger[open]>summary i:nth-child(2){background:var(--bronze)}
+.burger__panel{
+  position:absolute;right:0;top:calc(100% + 10px);width:min(300px,80vw);
+  background:rgba(10,12,16,.97);border:1px solid var(--line);
+  box-shadow:0 30px 70px -30px rgba(0,0,0,.95);
+}
+.burger__panel a{
+  display:block;padding:15px 18px;text-decoration:none;border-bottom:1px solid var(--line);
+}
+.burger__panel a:last-child{border-bottom:0}
+.burger__panel b{display:block;font-size:14px;font-weight:600}
+.burger__panel span{display:block;font-size:12px;color:var(--text-dimmer);margin-top:3px}
 
 /* ---------- boutons ---------- */
 .btn{
@@ -152,7 +225,7 @@ p{margin:0 0 16px}
 /* ---------- héros ---------- */
 .hero{position:relative;min-height:100svh;display:flex;align-items:flex-end;isolation:isolate}
 .hero__img{position:absolute;inset:0;z-index:-2}
-.hero__img img{width:100%;height:100%;object-fit:cover;object-position:50% 42%}
+.hero__img img{width:100%;height:100%;object-fit:cover;object-position:50% 46%}
 .hero::after{
   content:"";position:absolute;inset:0;z-index:-1;
   background:
@@ -202,9 +275,13 @@ p{margin:0 0 16px}
 .row--flip .row__media{order:2}
 .row__media{margin:0;position:relative;overflow:hidden;background:var(--ink-2)}
 .row__media img{width:100%;height:100%;object-fit:cover;aspect-ratio:4/3}
-/* recadrage serré sur l'haltère : écarte le logo d'une marque tierce
-   présent sur le sweat, qui n'a rien à faire sur une vitrine cliente */
-.row__media--tall img{aspect-ratio:3/4;object-position:22% 64%}
+/* Recadrage serré : on garde le geste (mains, barre, plaques) et on écarte
+   les visages identifiables ainsi que les logos des marques présentes sur
+   place. Utiliser le visage reconnaissable d'une personne sur un support
+   commercial relève du droit à l'image et suppose son accord écrit ; la
+   licence de la photo ne le couvre pas. */
+.row__media--tall img{aspect-ratio:3/4;object-position:50% 62%}
+.row__media--grip img{transform:scale(1.52);transform-origin:52% 84%}
 /* la photo de crêtes est chaude : on la refroidit pour tenir la palette */
 .row__media--cool img{filter:saturate(.72) contrast(1.04) hue-rotate(-6deg)}
 .row__media::after{
@@ -314,8 +391,11 @@ p{margin:0 0 16px}
 .foot__legal a{color:var(--text-dim)}
 
 /* ---------- responsive ---------- */
-@media (max-width:900px){
+@media (max-width:1080px){
   .nav__links{display:none}
+  .burger{display:block}
+}
+@media (max-width:900px){
   .row{grid-template-columns:1fr;gap:22px}
   .row--flip .row__media{order:0}
   .row__media img,.row__media--tall img{aspect-ratio:4/3}
@@ -324,13 +404,14 @@ p{margin:0 0 16px}
   .stats{grid-template-columns:1fr 1fr}
   .stat:nth-child(2){border-right:0}
   .stat:nth-child(1),.stat:nth-child(2){border-bottom:1px solid var(--line)}
-  .hero__img img{object-position:58% 42%}
+  .hero__img img{object-position:52% 46%}
 }
 @media (max-width:520px){
   .hero__cta{flex-direction:column;align-items:stretch}
   .hero__cta .btn{text-align:center}
   .eyebrow{font-size:10px;letter-spacing:.22em}
-  .nav{padding:12px 16px;gap:12px}
+  .nav{padding:12px 16px;gap:10px}
+  .nav__cta{display:none}
   .mark{letter-spacing:.26em;font-size:13px}
 }
 

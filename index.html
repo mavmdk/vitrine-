@@ -6,8 +6,8 @@
 <title>UPWARD — Coaching sportif &amp; préparation physique</title>
 <meta name="description" content="Diagnostic, programme personnalisé, nutrition, suivi hebdomadaire. La méthode UPWARD : un cadre écrit, des charges prescrites, des résultats mesurés." />
 <meta property="og:title" content="UPWARD — Coaching sportif haute performance" />
-<meta property="og:description" content="Tout le monde veut le sommet. Personne ne veut la montée." />
-<meta property="og:image" content="assets/img/hero-arete.jpg" />
+<meta property="og:description" content="See you at the top. Diagnostic, programme écrit, suivi hebdomadaire." />
+<meta property="og:image" content="assets/img/hero-k2.jpg" />
 <meta property="og:type" content="website" />
 <meta name="theme-color" content="#0a0c10" />
 <link rel="preload" href="assets/fonts/inter-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin />
@@ -19,27 +19,80 @@
 
 <header class="nav">
   <a class="mark" href="#top" aria-label="UPWARD, accueil">UPW<i class="arw" aria-hidden="true"></i>RD</a>
+
   <nav class="nav__links" aria-label="Principal">
-    <a href="#methode">La méthode</a>
+    <!-- menu déroulant : ouverture au survol et au clavier (:focus-within),
+         sans une ligne de JavaScript -->
+    <div class="drop">
+      <a class="drop__trigger" href="#methode" aria-haspopup="true">La méthode
+        <i class="drop__caret" aria-hidden="true"></i></a>
+
+      <div class="mega" role="group" aria-label="Aperçu de la méthode">
+        <a class="mega__card" href="#methode">
+          <span class="mega__img">
+            <picture>
+              <source type="image/webp" srcset="assets/img/ama-dablam@900.webp" />
+              <img src="assets/img/ama-dablam.jpg" alt="" loading="lazy" width="900" height="1125" />
+            </picture>
+          </span>
+          <span class="mega__label">La montée</span>
+          <span class="mega__desc">Diagnostic, programme écrit, périodisation sur 12 semaines.</span>
+        </a>
+
+        <a class="mega__card" href="#methode">
+          <span class="mega__img">
+            <picture>
+              <source type="image/webp" srcset="assets/img/crossfit-salle@800.webp" />
+              <img src="assets/img/crossfit-salle.jpg" alt="" loading="lazy" width="800" height="533" />
+            </picture>
+          </span>
+          <span class="mega__label">Le terrain</span>
+          <span class="mega__desc">Barre, anneaux, magnésie. Chaque séance a un critère de réussite.</span>
+        </a>
+
+        <a class="mega__card" href="#formules">
+          <span class="mega__img">
+            <picture>
+              <source type="image/webp" srcset="assets/img/terrain-glacier@1200.webp" />
+              <img src="assets/img/terrain-glacier.jpg" alt="" loading="lazy" width="1200" height="843" />
+            </picture>
+          </span>
+          <span class="mega__label">Les formules</span>
+          <span class="mega__desc">Trois niveaux d'accompagnement, du cadre seul au pilotage complet.</span>
+        </a>
+      </div>
+    </div>
+
     <a href="#formules">Formules</a>
     <a href="#contact">Contact</a>
   </nav>
-  <a class="btn btn--sm" href="#contact">Réserver un appel</a>
+
+  <!-- même menu, en accordéon, pour les écrans étroits -->
+  <details class="burger">
+    <summary aria-label="Ouvrir le menu"><i aria-hidden="true"></i><i aria-hidden="true"></i><i aria-hidden="true"></i></summary>
+    <div class="burger__panel">
+      <a href="#methode"><b>La méthode</b><span>Six étapes, aucune facultative</span></a>
+      <a href="#formules"><b>Formules</b><span>Trois niveaux d'accompagnement</span></a>
+      <a href="#contact"><b>Contact</b><span>Premier appel offert</span></a>
+    </div>
+  </details>
+
+  <a class="btn btn--sm nav__cta" href="#contact">Réserver un appel</a>
 </header>
 
 <!-- ================= HERO ================= -->
 <section class="hero" id="top">
   <picture class="hero__img">
-    <source type="image/webp" media="(max-width: 900px)" srcset="assets/img/hero-arete@1200.webp" />
-    <source type="image/webp" srcset="assets/img/hero-arete.webp" />
-    <img src="assets/img/hero-arete.jpg" alt="Un alpiniste seul progresse sur une arête de neige vers un sommet." width="1920" height="1303" fetchpriority="high" />
+    <source type="image/webp" media="(max-width: 900px)" srcset="assets/img/hero-k2@1100.webp" />
+    <source type="image/webp" srcset="assets/img/hero-k2.webp" />
+    <img src="assets/img/hero-k2.jpg" alt="Le K2, deuxième sommet du monde, vu depuis le glacier du Baltoro." width="1600" height="1200" fetchpriority="high" />
   </picture>
 
   <div class="hero__inner">
     <p class="eyebrow">Coaching sportif &amp; préparation physique</p>
-    <h1>Tout le monde<br />veut le sommet.<br /><em>Personne ne veut<br />la montée.</em></h1>
-    <p class="lede">La montée, c'est le programme. Les charges, le tempo, les semaines
-      où rien ne bouge. C'est là que je travaille.</p>
+    <h1>See you<br />at the <em>top.</em></h1>
+    <p class="lede">Diagnostic, programme écrit, suivi hebdomadaire.
+      Le reste, c'est du travail.</p>
     <div class="hero__cta">
       <a class="btn" href="#contact">Réserver mon appel</a>
       <a class="btn btn--ghost" href="#methode">Voir la méthode</a>
@@ -87,11 +140,11 @@
 
 <!-- 02 -->
 <section class="row row--flip">
-  <figure class="row__media row__media--tall">
+  <figure class="row__media row__media--tall row__media--grip">
     <picture>
-      <source type="image/webp" media="(max-width: 900px)" srcset="assets/img/haltere-main@700.webp" />
-      <source type="image/webp" srcset="assets/img/haltere-main.webp" />
-      <img src="assets/img/haltere-main.jpg" alt="Une main saisit un haltère devant un rack de salle." loading="lazy" width="1100" height="1650" />
+      <source type="image/webp" media="(max-width: 900px)" srcset="assets/img/crossfit-barre@900.webp" />
+      <source type="image/webp" srcset="assets/img/crossfit-barre.webp" />
+      <img src="assets/img/crossfit-barre.jpg" alt="Un athlète tire une barre chargée pendant une épreuve de CrossFit." loading="lazy" width="1400" height="2100" />
     </picture>
   </figure>
   <div class="row__text">
@@ -132,11 +185,11 @@
 
 <!-- 04 -->
 <section class="row">
-  <figure class="row__media row__media--cool">
+  <figure class="row__media row__media--tall">
     <picture>
-      <source type="image/webp" media="(max-width: 900px)" srcset="assets/img/brouillard-cretes@1100.webp" />
-      <source type="image/webp" srcset="assets/img/brouillard-cretes.webp" />
-      <img src="assets/img/brouillard-cretes.jpg" alt="Crêtes émergeant d'une mer de nuages à l'aube." loading="lazy" width="1760" height="1173" />
+      <source type="image/webp" media="(max-width: 900px)" srcset="assets/img/ama-dablam@900.webp" />
+      <source type="image/webp" srcset="assets/img/ama-dablam.webp" />
+      <img src="assets/img/ama-dablam.jpg" alt="Des porteurs montent un escalier de pierre face à l'Ama Dablam, dans l'Himalaya." loading="lazy" width="1400" height="1750" />
     </picture>
   </figure>
   <div class="row__text">
@@ -171,9 +224,9 @@
 <section class="row row--flip">
   <figure class="row__media">
     <picture>
-      <source type="image/webp" media="(max-width: 900px)" srcset="assets/img/sommet-panorama@1100.webp" />
-      <source type="image/webp" srcset="assets/img/sommet-panorama.webp" />
-      <img src="assets/img/sommet-panorama.jpg" alt="Panorama de sommets enneigés vus depuis une arête." loading="lazy" width="1760" height="1173" />
+      <source type="image/webp" media="(max-width: 900px)" srcset="assets/img/hero-arete@1200.webp" />
+      <source type="image/webp" srcset="assets/img/hero-arete.webp" />
+      <img src="assets/img/hero-arete.jpg" alt="Un alpiniste seul progresse sur une arête de neige vers le sommet." loading="lazy" width="1920" height="1303" />
     </picture>
   </figure>
   <div class="row__text">
@@ -266,9 +319,10 @@
     <p class="foot__ded">pour Pauline <span aria-hidden="true">&#9829;</span></p>
   </div>
   <p class="foot__credits">
-    Photographies&nbsp;: Adha65 (CC BY-SA 3.0) · Megaurab09 (CC BY-SA 4.0) ·
-    Nenad Stojkovic (CC BY 2.0) · Abbottportraits (CC BY-SA 3.0) ·
-    Kalablink (CC BY-SA 4.0) · BrettA343 (CC BY-SA 4.0) — via Wikimedia Commons.
+    Photographies&nbsp;: Svy123 (CC BY 3.0) · PulkitPithvaWiki (CC BY-SA 4.0) ·
+    Adha65 (CC BY-SA 3.0) · Megaurab09 (CC BY-SA 4.0) · Abbottportraits (CC BY-SA 3.0) ·
+    Lance Cpl. Christopher Johns et Sgt. Edward Eagerton (domaine public, U.S. DoD)
+    — via Wikimedia Commons.
   </p>
   <p class="foot__legal">© <span>2026</span> UPWARD — Tous droits réservés ·
     <a href="#top">Haut de page</a></p>
