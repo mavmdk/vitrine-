@@ -27,6 +27,8 @@ assets/css/site.css     l'intégralité du style de la vitrine
 assets/fonts/           Inter, auto-hébergée (voir RGPD plus bas)
 assets/img/             les photographies, en WebP + repli JPEG
 CREDITS.md              attribution des photographies — obligation légale
+tools/                  préparation des images (manuelle ou automatique)
+.github/workflows/      fabrication automatique des variantes d'images
 src/ vendor/            code de l'ancienne version 3D
 ```
 
@@ -64,10 +66,22 @@ src/ vendor/            code de l'ancienne version 3D
 
 ### Remplacer une photo
 
-Chaque photo occupe un **emplacement** nommé. Pour en changer, il suffit de
-fournir votre fichier : le script fabrique les trois variantes attendues
-(grande largeur en WebP, largeur mobile en WebP, repli JPEG) aux bonnes
-dimensions et sous les bons noms.
+Chaque photo occupe un **emplacement** nommé. Deux façons de la changer.
+
+**Sans rien installer, depuis github.com** — c'est la plus simple :
+
+1. ouvrez le dossier `assets/img/` dans le dépôt sur github.com ;
+2. bouton **Add file → Upload files**, glissez votre photo ;
+3. renommez-la exactement comme l'emplacement visé, par exemple
+   `crossfit-barre.jpg` (extension `.jpg` obligatoire) ;
+4. validez.
+
+L'automatisation `.github/workflows/images.yml` se déclenche seule : elle
+fabrique les versions WebP grande largeur et mobile, allège le JPEG s'il sort
+d'un appareil photo, et valide le résultat. Une minute plus tard le site est à
+jour, sans qu'une ligne de code ait été touchée.
+
+**Depuis un terminal**, si vous préférez :
 
 ```bash
 npm install sharp          # une seule fois

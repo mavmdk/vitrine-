@@ -1,0 +1,50 @@
+# Fabrique automatiquement les variantes d'images.
+#
+# Déposez simplement un JPEG dans assets/img/ (par glisser-déposer depuis
+# github.com : « Add file » → « Upload files ») en respectant le nom de
+# l'emplacement, par exemple crossfit-barre.jpg. Cette automatisation génère
+# les versions WebP grande largeur et mobile, redimensionne le JPEG de repli
+# s'il est trop lourd, puis valide le tout.
+
+name: Images
+
+on:
+  push:
+    paths:
+      - 'assets/img/**.jpg'
+      - 'assets/img/**.jpeg'
+      - 'assets/img/**.png'
+      - 'tools/build-images.mjs'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  variantes:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Installer sharp
+        run: npm install --no-save sharp
+
+      - name: Régénérer les variantes
+        run: node tools/build-images.mjs
+
+      - name: Valider si quelque chose a changé
+        run: |
+          if [ -n "$(git status --porcelain assets/img)" ]; then
+            git config user.name  "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git add assets/img
+            git commit -m "Variantes d'images régénérées automatiquement"
+            git push
+            echo "Variantes mises à jour et validées." >> $GITHUB_STEP_SUMMARY
+          else
+            echo "Rien à faire : les variantes étaient déjà à jour." >> $GITHUB_STEP_SUMMARY
+          fi
